@@ -1,0 +1,351 @@
+/* Main app styles that are specific to the layout and not global utilities */
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-main);
+  position: relative;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-main);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  flex-shrink: 0;
+  z-index: 10;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.02);
+}
+
+.sidebar-header {
+  margin-bottom: 2rem;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  margin-left: -0.5rem;
+  transition: background-color var(--transition-fast);
+}
+
+.sidebar-title:hover {
+  background-color: var(--bg-card);
+}
+
+.title-edit-icon {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebar-title:hover .title-edit-icon {
+  opacity: 1;
+}
+
+.title-edit-input {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background: var(--bg-card);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-sage);
+  width: 100%;
+  margin-left: -0.5rem;
+  box-shadow: var(--shadow-sm);
+  outline: none;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.cat-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.category-item:hover, .category-item.active {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.category-item.active {
+  border-color: var(--border-subtle);
+}
+
+.category-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.editable-cat-name {
+  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  padding: 0.2rem;
+  border-radius: 4px;
+}
+
+.editable-cat-name:focus {
+  background-color: var(--bg-main);
+  box-shadow: 0 0 0 1px var(--color-sage);
+}
+
+.delete-cat-btn {
+  opacity: 0;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.category-item:hover .delete-cat-btn {
+  opacity: 1;
+}
+
+.delete-cat-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.add-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-radius: 12px;
+  border: 1px dashed var(--border-subtle);
+}
+
+.add-cat-btn:hover {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border-color: var(--text-muted);
+}
+
+.add-cat-input-area {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.add-cat-input {
+  flex-grow: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.add-cat-input:focus {
+  border-color: var(--color-sage);
+  box-shadow: 0 0 0 2px rgba(138, 176, 128, 0.2);
+}
+
+.add-cat-save {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.add-cat-save:hover {
+  background: var(--color-sage);
+  color: white;
+  border-color: var(--color-sage);
+}
+
+/* Split View Wrapper */
+.main-wrapper {
+  flex-grow: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-main);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 4rem;
+  overflow-y: auto;
+  transition: padding var(--transition-smooth);
+}
+
+/* When side panel is active, shrink padding slightly for better fit */
+.main-content.split-active {
+  padding: 3rem 2.5rem;
+}
+
+.notes-sidebar {
+  width: 40%;
+  min-width: 350px;
+  max-width: 600px;
+  padding: 1.5rem 1.5rem 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid transparent;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+}
+
+/* Add Task Input */
+.add-task-container {
+  margin-bottom: 2rem;
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-smooth), transform var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.add-task-container:focus-within {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  border-color: var(--border-subtle);
+}
+
+.add-task-input {
+  flex-grow: 1;
+  font-size: 1.05rem;
+  color: var(--text-main);
+}
+
+.add-task-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* Modal styles for deletion */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(252, 251, 250, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: 24px;
+  box-shadow: var(--shadow-hover);
+  border: 1px solid var(--border-subtle);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.modal-content p {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-actions button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.btn-cancel {
+  background: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-cancel:hover {
+  background: #f1efec;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}

@@ -1,0 +1,66 @@
+.task-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 4rem;
+}
+
+.task-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 300;
+  margin-top: 3rem;
+  padding: 3rem;
+  border-radius: 16px;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-subtle);
+}
+
+.completed-section {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1rem;
+}
+
+.completed-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  margin-bottom: 1rem;
+}
+
+.completed-header:hover {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+
+.completed-title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.completed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  opacity: 0.7; /* Make completed items slightly faded */
+  transition: opacity var(--transition-smooth);
+}
+
+.completed-list:hover {
+  opacity: 1; /* Restore opacity on hover for readability */
+}
+
+/* Ensure the completed items themselves have strike-through (handled by TaskItem) */

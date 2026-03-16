@@ -1,0 +1,165 @@
+.task-item {
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+  border-left: 4px solid transparent;
+  overflow: hidden;
+}
+
+.task-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.task-item.selected {
+  border-left-color: var(--task-color);
+  box-shadow: var(--shadow-md);
+  background-color: color-mix(in srgb, var(--bg-card) 98%, var(--task-color));
+  transform: translateY(-2px);
+}
+
+.task-item.pinned {
+  border-left-color: var(--task-color);
+  background-color: color-mix(in srgb, var(--bg-card) 95%, var(--task-color));
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+}
+
+.task-check-btn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.task-check-btn:hover .icon-incomplete {
+  color: var(--task-color);
+}
+
+.task-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-title {
+  font-size: 1.05rem;
+  color: var(--text-main);
+  transition: color var(--transition-fast);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.subtask-indicator {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.task-item:hover .task-actions,
+.task-actions:focus-within {
+  opacity: 1;
+}
+
+.action-btn {
+  color: var(--text-muted);
+  padding: 0.4rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+.action-btn.active-pin {
+  color: var(--task-color);
+  opacity: 1; /* Always visible if pinned */
+}
+
+/* Ensure actions are visible if pinned, even without hover */
+.task-item.pinned .task-actions {
+  opacity: 1; 
+}
+
+.delete-btn:hover {
+  color: #e57373; /* soft red */
+  background-color: rgba(229, 115, 115, 0.1);
+}
+
+/* Subtasks */
+.subtasks-container {
+  padding: 0 1.25rem 1.25rem 3.5rem;
+  border-top: 1px dashed var(--border-subtle);
+  margin-top: -0.5rem;
+  padding-top: 1rem;
+  background-color: rgba(0,0,0,0.01);
+}
+
+.subtasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.subtask-check {
+  transform: scale(0.9);
+}
+
+.subtask-title {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  flex-grow: 1;
+}
+
+.add-subtask-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  background-color: var(--bg-main);
+  border-radius: 8px;
+}
+
+.add-subtask-input {
+  flex-grow: 1;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.add-subtask-input::placeholder {
+  color: var(--text-muted);
+}
