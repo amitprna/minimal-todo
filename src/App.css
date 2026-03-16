@@ -1,4 +1,4 @@
-/* Main app styles that are specific to the layout and not global utilities */
+/* Main app styles */
 
 .app-container {
   display: flex;
@@ -9,71 +9,80 @@
   position: relative;
 }
 
+/* ── Sidebar ─────────────────────────────────────────────────────── */
 .sidebar {
-  width: 280px;
+  width: 290px;
   background-color: var(--bg-main);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   flex-shrink: 0;
   z-index: 10;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.02);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.04);
 }
 
 .sidebar-header {
-  margin-bottom: 2rem;
-  min-height: 2.5rem;
+  margin-bottom: 2.5rem;
+  min-height: 2.75rem;
   display: flex;
   align-items: center;
 }
 
-.sidebar-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-main);
-  letter-spacing: -0.02em;
+/* Sidebar title — bigger and bolder per request */
+.sidebar-title-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  width: 100%;
+}
+
+.sidebar-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.title-edit-btn {
+  color: var(--text-muted);
+  padding: 0.35rem;
   border-radius: 8px;
-  margin-left: -0.5rem;
-  transition: background-color var(--transition-fast);
-}
-
-.sidebar-title:hover {
-  background-color: var(--bg-card);
-}
-
-.title-edit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), background var(--transition-fast);
 }
 
-.sidebar-title:hover .title-edit-icon {
+.sidebar-header:hover .title-edit-btn {
   opacity: 1;
 }
 
+.title-edit-btn:hover {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+
 .title-edit-input {
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text-main);
   background: var(--bg-card);
-  padding: 0.25rem 0.5rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 8px;
-  border: 1px solid var(--color-sage);
+  border: 1.5px solid var(--color-sage);
   width: 100%;
-  margin-left: -0.5rem;
   box-shadow: var(--shadow-sm);
   outline: none;
 }
 
+/* ── Category List ────────────────────────────────────────────────── */
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
   flex-grow: 1;
   overflow-y: auto;
 }
@@ -82,13 +91,27 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0.75rem;
-  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
   color: var(--text-muted);
   font-weight: 400;
   transition: all var(--transition-fast);
   cursor: pointer;
   border: 1px solid transparent;
+  user-select: none;
+}
+
+.category-item:hover {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.category-item.active {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
 }
 
 .cat-main {
@@ -99,49 +122,60 @@
   min-width: 0;
 }
 
-.category-item:hover, .category-item.active {
-  background-color: var(--bg-card);
-  color: var(--text-main);
-  box-shadow: var(--shadow-sm);
-}
-
-.category-item.active {
-  border-color: var(--border-subtle);
-}
-
+/* Bigger dot for better contrast */
 .category-color-dot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18), inset 0 1px 3px rgba(255,255,255,0.4);
 }
 
-.editable-cat-name {
-  outline: none;
+.cat-name {
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cat-rename-input {
+  font-size: 0.9rem;
+  background: var(--bg-main);
+  border: 1px solid var(--color-sage);
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
   flex-grow: 1;
-  padding: 0.2rem;
-  border-radius: 4px;
+  color: var(--text-main);
+  outline: none;
 }
 
-.editable-cat-name:focus {
-  background-color: var(--bg-main);
-  box-shadow: 0 0 0 1px var(--color-sage);
-}
-
-.delete-cat-btn {
+/* Category action buttons (edit + delete) */
+.cat-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.category-item:hover .cat-actions,
+.category-item.active .cat-actions {
+  opacity: 1;
+}
+
+.cat-action-btn {
   color: var(--text-muted);
   padding: 0.25rem;
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all var(--transition-fast);
 }
 
-.category-item:hover .delete-cat-btn {
-  opacity: 1;
+.cat-action-btn:hover {
+  background-color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .delete-cat-btn:hover {
@@ -149,65 +183,69 @@
   color: #ef4444;
 }
 
+/* Add category controls */
 .add-cat-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   color: var(--text-muted);
   font-size: 0.9rem;
   border-radius: 12px;
   border: 1px dashed var(--border-subtle);
+  transition: all var(--transition-fast);
 }
 
 .add-cat-btn:hover {
   background-color: var(--bg-card);
   color: var(--text-main);
   border-color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
 }
 
 .add-cat-input-area {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .add-cat-input {
   flex-grow: 1;
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  padding: 0.5rem;
+  border: 1.5px solid var(--border-subtle);
+  padding: 0.5rem 0.75rem;
   border-radius: 8px;
   font-size: 0.9rem;
-  width: 100%;
+  color: var(--text-main);
 }
 
 .add-cat-input:focus {
   border-color: var(--color-sage);
-  box-shadow: 0 0 0 2px rgba(138, 176, 128, 0.2);
+  box-shadow: 0 0 0 3px rgba(138, 176, 128, 0.15);
+  outline: none;
 }
 
 .add-cat-save {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  padding: 0.5rem;
+  background: var(--color-sage);
+  color: white;
+  padding: 0.5rem 0.9rem;
   border-radius: 8px;
   font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(138, 176, 128, 0.3);
 }
 
 .add-cat-save:hover {
-  background: var(--color-sage);
-  color: white;
-  border-color: var(--color-sage);
+  background: #7baa70;
+  transform: translateY(-1px);
 }
 
-/* Split View Wrapper */
+/* ── Main layout ─────────────────────────────────────────────────── */
 .main-wrapper {
   flex-grow: 1;
   display: flex;
   overflow: hidden;
-  position: relative;
   background-color: var(--bg-main);
 }
 
@@ -220,37 +258,79 @@
   transition: padding var(--transition-smooth);
 }
 
-/* When side panel is active, shrink padding slightly for better fit */
 .main-content.split-active {
   padding: 3rem 2.5rem;
 }
 
 .notes-sidebar {
-  width: 40%;
-  min-width: 350px;
-  max-width: 600px;
+  width: 42%;
+  min-width: 360px;
+  max-width: 620px;
   padding: 1.5rem 1.5rem 1.5rem 0;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid transparent;
 }
 
-
+/* ── Header ──────────────────────────────────────────────────────── */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Vertical colored bar next to the list title (requested highlight) */
+.header-color-bar {
+  width: 5px;
+  height: 3rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
 }
 
 .header h1 {
-  font-size: 2.5rem;
-  font-weight: 300;
+  font-size: 2.8rem;
+  font-weight: 600;
   color: var(--text-main);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-/* Add Task Input */
+/* Notes toggle button */
+.notes-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.notes-toggle-btn:hover {
+  box-shadow: var(--shadow-md);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.notes-toggle-btn.active {
+  background: var(--text-main);
+  color: white;
+  border-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Add Task Input ───────────────────────────────────────────────── */
 .add-task-container {
   margin-bottom: 2rem;
   background-color: var(--bg-card);
@@ -281,12 +361,12 @@
   font-weight: 300;
 }
 
-/* Modal styles for deletion */
+/* ── Deletion Modal ───────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(252, 251, 250, 0.8);
-  backdrop-filter: blur(8px);
+  background: rgba(252, 251, 250, 0.75);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -302,6 +382,7 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
+  animation: slideInUp 0.25s ease forwards;
 }
 
 .modal-content h3 {
@@ -335,9 +416,7 @@
   border: 1px solid var(--border-subtle);
 }
 
-.btn-cancel:hover {
-  background: #f1efec;
-}
+.btn-cancel:hover { background: #f1efec; }
 
 .btn-delete {
   background: #ef4444;

@@ -1,12 +1,20 @@
-import { useState } from 'react'
-import { Plus, Edit3, Trash2, X } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { Plus, Edit3, Trash2 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import TaskList from './components/TaskList'
 import TaskNotes from './components/TaskNotes'
 import './App.css'
 
-// Initial categories with richer Japandi colors
+const CATEGORY_COLORS = [
+  'var(--color-sage)',
+  'var(--color-slate)',
+  'var(--color-sand)',
+  'var(--color-clay)',
+  'var(--color-rose)',
+  'var(--color-peach)',
+];
+
 const initialCategories = [
   { id: '1', name: 'Personal', color: 'var(--color-sage)' },
   { id: '2', name: 'Work', color: 'var(--color-slate)' },
@@ -15,48 +23,67 @@ const initialCategories = [
   { id: '5', name: 'Ideas', color: 'var(--color-rose)' }
 ];
 
+// Play a subtle chime sound on task completion
+const playCompleteSound = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1108, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (e) { /* Ignore if audio not supported */ }
+};
+
 function App() {
   const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Moments');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitleValue, setEditTitleValue] = useState(globalTitle);
 
   const [categories, setCategories] = useLocalStorage('japandi-categories', initialCategories);
-  const [activeCategory, setActiveCategory] = useState(initialCategories[0].id);
-  
+  const [activeCategory, setActiveCategory] = useState(() => {
+    const cats = JSON.parse(localStorage.getItem('japandi-categories') || 'null');
+    return (cats && cats[0]?.id) || initialCategories[0].id;
+  });
+
+  // Per-category notes stored by category id
+  const [categoryNotes, setCategoryNotes] = useLocalStorage('japandi-cat-notes', {});
+
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
-  
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [editingCategoryValue, setEditingCategoryValue] = useState('');
+
   const [tasks, setTasks] = useLocalStorage('japandi-tasks', []);
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  
-  // Selected task for markdown notes pane
-  const [selectedTask, setSelectedTask] = useState(null);
-  
-  // Modal state for deletion
+
+  // Note panel is per-category
+  const [notesPanelOpen, setNotesPanelOpen] = useState(false);
+
+  // Modal for category deletion
   const [deletingCategory, setDeletingCategory] = useState(null);
 
   const currentCategory = categories.find(c => c.id === activeCategory);
   const categoryTasks = tasks.filter(t => t.categoryId === activeCategory);
 
-  // --- Global Title Editing ---
+  // --- Global Title ---
   const saveGlobalTitle = () => {
-    if (editTitleValue.trim()) {
-      setGlobalTitle(editTitleValue.trim());
-    } else {
-      setEditTitleValue(globalTitle);
-    }
+    if (editTitleValue.trim()) setGlobalTitle(editTitleValue.trim());
+    else setEditTitleValue(globalTitle);
     setIsEditingTitle(false);
   };
 
   // --- Category Management ---
   const handleAddCategory = () => {
     if (newCategoryName.trim()) {
-      const newCat = {
-        id: uuidv4(),
-        name: newCategoryName.trim(),
-        // Pick a random color from the palette to keep it simple
-        color: initialCategories[Math.floor(Math.random() * initialCategories.length)].color
-      };
+      const colorIdx = categories.length % CATEGORY_COLORS.length;
+      const newCat = { id: uuidv4(), name: newCategoryName.trim(), color: CATEGORY_COLORS[colorIdx] };
       setCategories([...categories, newCat]);
       setActiveCategory(newCat.id);
       setNewCategoryName('');
@@ -64,27 +91,36 @@ function App() {
     }
   };
 
-  const confirmDeleteCategory = (id) => {
+  const startEditCategory = (e, cat) => {
+    e.stopPropagation();
+    setEditingCategoryId(cat.id);
+    setEditingCategoryValue(cat.name);
+  };
+
+  const saveEditCategory = () => {
+    if (editingCategoryValue.trim()) {
+      setCategories(categories.map(c => c.id === editingCategoryId ? { ...c, name: editingCategoryValue.trim() } : c));
+    }
+    setEditingCategoryId(null);
+  };
+
+  const confirmDeleteCategory = (e, id) => {
+    e.stopPropagation();
     setDeletingCategory(categories.find(c => c.id === id));
   };
 
   const deleteCategory = () => {
     if (deletingCategory) {
-      setCategories(categories.filter(c => c.id !== deletingCategory.id));
-      setTasks(tasks.filter(t => t.categoryId !== deletingCategory.id)); // Clean up tasks
+      const remaining = categories.filter(c => c.id !== deletingCategory.id);
+      setCategories(remaining);
+      setTasks(tasks.filter(t => t.categoryId !== deletingCategory.id));
+      const newNotes = { ...categoryNotes };
+      delete newNotes[deletingCategory.id];
+      setCategoryNotes(newNotes);
       if (activeCategory === deletingCategory.id) {
-        setActiveCategory(categories[0]?.id || null);
-      }
-      if (selectedTask?.categoryId === deletingCategory.id) {
-        setSelectedTask(null);
+        setActiveCategory(remaining[0]?.id || null);
       }
       setDeletingCategory(null);
-    }
-  };
-
-  const renameCategory = (id, newName) => {
-    if (newName.trim()) {
-      setCategories(categories.map(c => c.id === id ? { ...c, name: newName.trim() } : c));
     }
   };
 
@@ -98,19 +134,24 @@ function App() {
         completed: false,
         pinned: false,
         subtasks: [],
-        notes: ''
       };
       setTasks([...tasks, newTask]);
       setNewTaskTitle('');
     }
   };
 
-  const updateTaskField = (taskId, field, value) => {
-    setTasks(tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t));
-    // Also update selectedTask if it's the one being modified
-    if (selectedTask && selectedTask.id === taskId) {
-      setSelectedTask(prev => ({ ...prev, [field]: value }));
-    }
+  const updateTaskField = useCallback((taskId, field, value) => {
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
+  }, [setTasks]);
+
+  const handleToggleComplete = useCallback((id) => {
+    const task = tasks.find(t => t.id === id);
+    if (task && !task.completed) playCompleteSound();
+    updateTaskField(id, 'completed', !task?.completed);
+  }, [tasks, updateTaskField]);
+
+  const handleSaveCategoryNotes = (catId, notes) => {
+    setCategoryNotes(prev => ({ ...prev, [catId]: notes }));
   };
 
   // --- Render ---
@@ -120,8 +161,8 @@ function App() {
       <aside className="sidebar">
         <div className="sidebar-header">
           {isEditingTitle ? (
-            <input 
-              type="text" 
+            <input
+              type="text"
               className="title-edit-input"
               value={editTitleValue}
               onChange={e => setEditTitleValue(e.target.value)}
@@ -130,62 +171,57 @@ function App() {
               autoFocus
             />
           ) : (
-             <h2 
-               className="sidebar-title" 
-               onClick={() => setIsEditingTitle(true)}
-               title="Click to rename"
-             >
-               {globalTitle} <Edit3 size={14} className="title-edit-icon text-muted" />
-             </h2>
-          )}
-        </div>
-        
-        <nav className="category-list">
-          {categories.map(category => (
-            <div 
-              key={category.id}
-              className={`category-item ${activeCategory === category.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(category.id)}
-            >
-              <div className="cat-main">
-                <div 
-                  className="category-color-dot" 
-                  style={{ backgroundColor: category.color }} 
-                />
-                <span 
-                  contentEditable
-                  suppressContentEditableWarning
-                  onBlur={(e) => renameCategory(category.id, e.target.innerText)}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }}
-                  onClick={e => e.stopPropagation()} // Prevent setting active on edit click
-                  className="editable-cat-name"
-                >
-                  {category.name}
-                </span>
-              </div>
-              
-              <button 
-                className="delete-cat-btn"
-                onClick={(e) => { e.stopPropagation(); confirmDeleteCategory(category.id); }}
-                title="Delete List"
-              >
-                <Trash2 size={14} />
+            <div className="sidebar-title-row">
+              <h2 className="sidebar-title">{globalTitle}</h2>
+              <button className="title-edit-btn" onClick={() => { setIsEditingTitle(true); setEditTitleValue(globalTitle); }} title="Rename">
+                <Edit3 size={14} />
               </button>
             </div>
+          )}
+        </div>
+
+        <nav className="category-list">
+          {categories.map(category => (
+            <div
+              key={category.id}
+              className={`category-item ${activeCategory === category.id ? 'active' : ''}`}
+              onClick={() => { setActiveCategory(category.id); setNotesPanelOpen(false); }}
+            >
+              <div className="cat-main">
+                <div className="category-color-dot" style={{ backgroundColor: category.color }} />
+                {editingCategoryId === category.id ? (
+                  <input
+                    className="cat-rename-input"
+                    value={editingCategoryValue}
+                    onChange={e => setEditingCategoryValue(e.target.value)}
+                    onBlur={saveEditCategory}
+                    onKeyDown={e => { if (e.key === 'Enter') saveEditCategory(); if (e.key === 'Escape') setEditingCategoryId(null); }}
+                    onClick={e => e.stopPropagation()}
+                    autoFocus
+                  />
+                ) : (
+                  <span className="cat-name">{category.name}</span>
+                )}
+              </div>
+              <div className="cat-actions">
+                <button className="cat-action-btn" onClick={(e) => startEditCategory(e, category)} title="Rename">
+                  <Edit3 size={13} />
+                </button>
+                <button className="cat-action-btn delete-cat-btn" onClick={(e) => confirmDeleteCategory(e, category.id)} title="Delete">
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
           ))}
-          
-          {/* Add Category Section */}
+
           {isAddingCategory ? (
             <div className="add-cat-input-area animate-in">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="List name..."
                 value={newCategoryName}
                 onChange={e => setNewCategoryName(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') handleAddCategory();
-                  if (e.key === 'Escape') setIsAddingCategory(false);
-                }}
+                onKeyDown={e => { if (e.key === 'Enter') handleAddCategory(); if (e.key === 'Escape') setIsAddingCategory(false); }}
                 autoFocus
                 className="add-cat-input"
               />
@@ -199,19 +235,31 @@ function App() {
         </nav>
       </aside>
 
-      {/* Main Content Split View Wrapper */}
+      {/* Main Content Split View */}
       <div className="main-wrapper">
-        <main className={`main-content ${selectedTask ? 'split-active' : ''}`}>
+        <main className={`main-content ${notesPanelOpen ? 'split-active' : ''}`}>
           <header className="header animate-in">
-            <h1>{currentCategory?.name || 'Create a list'}</h1>
+            <div className="header-left">
+              <div className="header-color-bar" style={{ backgroundColor: currentCategory?.color }} />
+              <h1>{currentCategory?.name || 'Select a list'}</h1>
+            </div>
+            {currentCategory && (
+              <button
+                className={`notes-toggle-btn ${notesPanelOpen ? 'active' : ''}`}
+                onClick={() => setNotesPanelOpen(p => !p)}
+                title="Toggle Notes"
+              >
+                <Edit3 size={18} />
+                <span>{notesPanelOpen ? 'Hide Notes' : 'Notes'}</span>
+              </button>
+            )}
           </header>
 
-          {/* Input Area */}
           <div className="add-task-container animate-in" style={{ animationDelay: '0.1s' }}>
-            <Plus size={20} className="text-muted" style={{ color: 'var(--text-muted)' }} />
-            <input 
-              type="text" 
-              className="add-task-input" 
+            <Plus size={20} style={{ color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              className="add-task-input"
               placeholder="Add task..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
@@ -220,21 +268,15 @@ function App() {
             />
           </div>
 
-          {/* Task List */}
           <div className="task-board animate-in" style={{ animationDelay: '0.2s' }}>
             {activeCategory ? (
-              <TaskList 
+              <TaskList
                 tasks={categoryTasks}
                 categoryColor={currentCategory?.color || 'var(--text-main)'}
-                onToggleComplete={(id) => updateTaskField(id, 'completed', !tasks.find(t=>t.id===id).completed)}
-                onTogglePin={(id) => updateTaskField(id, 'pinned', !tasks.find(t=>t.id===id).pinned)}
-                onDelete={(id) => {
-                  setTasks(tasks.filter(t => t.id !== id));
-                  if (selectedTask?.id === id) setSelectedTask(null);
-                }}
+                onToggleComplete={handleToggleComplete}
+                onTogglePin={(id) => updateTaskField(id, 'pinned', !tasks.find(t => t.id === id).pinned)}
+                onDelete={(id) => setTasks(tasks.filter(t => t.id !== id))}
                 onUpdateSubtasks={(id, st) => updateTaskField(id, 'subtasks', st)}
-                onSelectTask={(task) => setSelectedTask(task)} // Pass select handler
-                selectedTaskId={selectedTask?.id}
               />
             ) : (
               <div className="empty-state">Select or create a list to begin.</div>
@@ -242,14 +284,14 @@ function App() {
           </div>
         </main>
 
-        {/* Markdown Notes Panel */}
-        {selectedTask && (
+        {/* Category-level Markdown Notes Panel */}
+        {notesPanelOpen && currentCategory && (
           <aside className="notes-sidebar animate-in">
-            <TaskNotes 
-              task={selectedTask}
-              onClose={() => setSelectedTask(null)}
-              onSaveNotes={(id, notes) => updateTaskField(id, 'notes', notes)}
-              categoryColor={categories.find(c => c.id === selectedTask.categoryId)?.color}
+            <TaskNotes
+              task={{ id: currentCategory.id, title: `${currentCategory.name} — Notes`, notes: categoryNotes[currentCategory.id] || '' }}
+              onClose={() => setNotesPanelOpen(false)}
+              onSaveNotes={(id, notes) => handleSaveCategoryNotes(id, notes)}
+              categoryColor={currentCategory.color}
             />
           </aside>
         )}
@@ -260,7 +302,7 @@ function App() {
         <div className="modal-overlay animate-in">
           <div className="modal-content">
             <h3>Delete "{deletingCategory.name}"?</h3>
-            <p>This will permanently delete the list and all its tasks. This action cannot be undone.</p>
+            <p>This will permanently delete the list and all its tasks. This cannot be undone.</p>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setDeletingCategory(null)}>Cancel</button>
               <button className="btn-delete" onClick={deleteCategory}>Delete List</button>
@@ -269,7 +311,7 @@ function App() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export default App

@@ -8,13 +8,13 @@
   --text-muted: #8c8681; /* Warm muted gray */
   --border-subtle: #eae5de; /* Very light warm gray border */
   
-  /* Category Colors (Muted but more saturated, more "wow") */
-  --color-sage: #8ab080;   /* Richer green */
-  --color-peach: #e8a58a;  /* Deeper peach */
-  --color-sand: #d1bfae;   /* Warmer sand */
-  --color-slate: #8f9fa8;  /* Blueish slate, deeper */
-  --color-rose: #d69ca3;   /* Richer dusty rose */
-  --color-clay: #c7967b;   /* Warmer terracotta/clay */
+  /* Category Colors — high contrast, warm Japandi palette */
+  --color-sage: #6fa664;   /* Vibrant forest green */
+  --color-peach: #e88a66;  /* Rich terracotta peach */
+  --color-sand: #c4aa8f;   /* Deeper warm sand */
+  --color-slate: #6d8fa3;  /* Stronger slate blue */
+  --color-rose: #c8788a;   /* Deeper dusty rose */
+  --color-clay: #b8714f;   /* Bold burnt clay */
 
   /* Rich 3D Shadows for modern, premium "wow" feel */
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);

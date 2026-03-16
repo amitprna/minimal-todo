@@ -9,9 +9,7 @@ export default function TaskList({
   onToggleComplete, 
   onTogglePin, 
   onDelete,
-  onUpdateSubtasks,
-  onSelectTask,
-  selectedTaskId
+  onUpdateSubtasks
 }) {
   const [showCompleted, setShowCompleted] = useState(false);
 
@@ -23,7 +21,8 @@ export default function TaskList({
   if (tasks.length === 0) {
     return (
       <div className="empty-state animate-in">
-        <p>No tasks yet. Create a beautiful moment.</p>
+        <p>No tasks yet.</p>
+        <span className="empty-add-hint">↑ Add a task above</span>
       </div>
     );
   }
@@ -37,8 +36,6 @@ export default function TaskList({
         onTogglePin={onTogglePin}
         onDelete={onDelete}
         onUpdateSubtasks={onUpdateSubtasks}
-        onSelectTask={onSelectTask}
-        isSelected={selectedTaskId === task.id}
       />
     </div>
   );

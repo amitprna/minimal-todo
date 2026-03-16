@@ -22,7 +22,13 @@
 
 .task-item.pinned {
   border-left-color: var(--task-color);
-  background-color: color-mix(in srgb, var(--bg-card) 95%, var(--task-color));
+  /* Use a solid soft wash of the category color — more contrast */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--bg-card) 78%, var(--task-color)) 0%,
+    var(--bg-card) 100%
+  );
+  box-shadow: var(--shadow-md), -2px 0 0 var(--task-color);
 }
 
 .task-main {
