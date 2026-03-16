@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from 'react'
-import { Plus, Edit3, Trash2, Palette } from 'lucide-react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { Plus, Edit3, Trash2, Palette, Moon, Sun } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import TaskList from './components/TaskList'
@@ -73,6 +73,17 @@ function App() {
   const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Moments');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitleValue, setEditTitleValue] = useState(globalTitle);
+
+  // --- Dark Mode State ---
+  const [isDarkMode, setIsDarkMode] = useLocalStorage('japandi-dark-mode', false);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   const [categories, setCategories] = useLocalStorage('japandi-categories', initialCategories);
   const [activeCategory, setActiveCategory] = useState(() => {
@@ -242,8 +253,9 @@ function App() {
     <div className="app-container">
       {/* Sidebar */}
       <aside className="sidebar">
-        <div className="sidebar-header">
-          {isEditingTitle ? (
+        <div className="sidebar-content-wrapper">
+          <div className="sidebar-header">
+            {isEditingTitle ? (
             <input
               type="text"
               className="title-edit-input"
@@ -261,7 +273,7 @@ function App() {
               </button>
             </div>
           )}
-        </div>
+          </div>
 
         <nav className="category-list">
           {categories.map(category => (
@@ -344,6 +356,17 @@ function App() {
             </button>
           )}
         </nav>
+
+        <div className="sidebar-footer">
+          <button 
+            className="theme-toggle-btn"
+            onClick={() => setIsDarkMode(prev => !prev)}
+            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
+        </div>
       </aside>
 
       {/* Main Content Split View */}

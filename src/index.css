@@ -27,6 +27,27 @@
   --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+body.dark {
+  --bg-main: #1a1918; /* Deep warm charcoal */
+  --bg-card: #242220; /* Slightly lighter charcoal for cards */
+  --text-main: #e8e6e3; /* Soft off-white */
+  --text-muted: #8c8681; /* Warm muted gray (same as light mode) */
+  --border-subtle: #363330; /* Dark warm gray border */
+
+  /* Dark mode category colors — slightly desaturated/adjusted for dark bg */
+  --color-sage: #5c8a52;
+  --color-peach: #d87652;
+  --color-sand: #b09780;
+  --color-slate: #5a7b8f;
+  --color-rose: #b56779;
+  --color-clay: #a66242;
+
+  /* Shadows adjustments for dark mode */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-hover: 0 20px 48px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
