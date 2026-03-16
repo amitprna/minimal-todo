@@ -2,7 +2,7 @@
   background-color: var(--bg-card);
   border-radius: 20px;
   box-shadow: var(--shadow-md);
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -10,157 +10,220 @@
   overflow: hidden;
 }
 
+/* ── Header ────────────────────────────────────── */
 .notes-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+}
+
+.notes-title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.notes-color-bar {
+  width: 4px;
+  height: 1.4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 .notes-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  max-width: 80%;
-  line-height: 1.4;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.notes-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
+/* ── Icon buttons ────────────────────────────────── */
 .icon-btn {
-  padding: 0.5rem;
+  padding: 0.45rem;
   border-radius: 8px;
   color: var(--text-muted);
   background: var(--bg-main);
-  box-shadow: var(--shadow-inner);
+  flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
 .icon-btn:hover {
-  background: var(--bg-card);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-main);
-  transform: translateY(-2px);
-}
-
-.close-btn:hover {
+  background: #fee2e2;
   color: #e57373;
+  transform: scale(1.1);
 }
 
-.notes-content {
+/* ── Notes body ──────────────────────────────────── */
+.notes-body {
   flex-grow: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  cursor: text;
+  padding-right: 0.25rem;
+  position: relative;
+  min-height: 0;
 }
 
-.notes-editor {
-  width: 100%;
+/* The rendered markdown preview */
+.notes-preview {
+  padding: 0.25rem 0.25rem 3rem;
+  min-height: 60px;
+}
+
+.notes-preview.empty {
   height: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.notes-placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+  font-style: italic;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+/* The raw-text textarea — shown when focused */
+.notes-textarea {
+  width: 100%;
   resize: none;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.97rem;
+  line-height: 1.7;
   color: var(--text-main);
-  padding: 1rem;
-  background-color: var(--bg-main);
-  border-radius: 12px;
-  box-shadow: var(--shadow-inner);
+  background: transparent;
+  padding: 0.25rem;
+  overflow: hidden; /* auto-grows via JS */
+  min-height: 200px;
 }
 
-/* Markdown Styles */
-.markdown-preview {
-  color: var(--text-main);
-  line-height: 1.6;
-  font-size: 1rem;
+.notes-textarea.hidden {
+  /* Visually hidden but in DOM so we can focus it */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  min-height: 0;
 }
 
-.markdown-preview h1,
-.markdown-preview h2,
-.markdown-preview h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
+.notes-textarea.visible {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Toolbar that appears during editing */
+.notes-toolbar {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'Courier New', monospace;
+  opacity: 0.7;
+}
+
+.notes-done-btn {
+  background: var(--text-main);
+  color: var(--bg-card);
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.notes-done-btn:hover {
+  opacity: 0.85;
+}
+
+/* ── Markdown Styles ─────────────────────────────── */
+.notes-preview h1,
+.notes-preview h2,
+.notes-preview h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.6rem;
   font-weight: 600;
   color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
-.markdown-preview p {
-  margin-bottom: 1rem;
+.notes-preview h1 { font-size: 1.4rem; }
+.notes-preview h2 { font-size: 1.2rem; }
+.notes-preview h3 { font-size: 1.05rem; }
+
+.notes-preview p {
+  margin-bottom: 0.85rem;
+  color: var(--text-main);
+  line-height: 1.7;
 }
 
-.markdown-preview ul,
-.markdown-preview ol {
+.notes-preview ul,
+.notes-preview ol {
   margin-bottom: 1rem;
   padding-left: 1.5rem;
 }
 
-.markdown-preview li {
-  margin-bottom: 0.25rem;
-}
+.notes-preview li { margin-bottom: 0.3rem; }
 
-.markdown-preview a {
+.notes-preview strong { font-weight: 600; }
+.notes-preview em { font-style: italic; color: var(--text-muted); }
+
+.notes-preview a {
   color: var(--color-slate);
   text-decoration: none;
 }
 
-.markdown-preview a:hover {
-  text-decoration: underline;
-}
+.notes-preview a:hover { text-decoration: underline; }
 
-.markdown-preview code {
+.notes-preview code {
   background-color: var(--bg-main);
-  padding: 0.2em 0.4em;
+  padding: 0.15em 0.4em;
   border-radius: 4px;
-  font-size: 0.9em;
-  color: #e8a58a;
+  font-size: 0.88em;
+  color: var(--color-peach);
+  font-family: 'Courier New', monospace;
 }
 
-.markdown-preview pre code {
-  background-color: transparent;
-  padding: 0;
-  color: inherit;
-}
-
-.markdown-preview pre {
+.notes-preview pre {
   background-color: var(--bg-main);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow-x: auto;
   margin-bottom: 1rem;
   box-shadow: var(--shadow-inner);
 }
 
-.markdown-preview blockquote {
-  border-left: 4px solid var(--border-subtle);
-  padding-left: 1rem;
-  color: var(--text-muted);
-  margin-left: 0;
-  margin-bottom: 1rem;
-}
-
-.empty-notes {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--text-muted);
-  gap: 1rem;
-}
-
-.start-writing-btn {
-  padding: 0.5rem 1rem;
-  background-color: var(--bg-main);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
+.notes-preview pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--text-main);
   font-size: 0.9rem;
 }
 
-.start-writing-btn:hover {
-  background-color: var(--bg-card);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-  color: var(--text-main);
+.notes-preview blockquote {
+  border-left: 3px solid var(--border-subtle);
+  padding-left: 1rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+  font-style: italic;
+}
+
+.notes-preview hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 1.5rem 0;
 }

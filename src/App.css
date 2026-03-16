@@ -37,12 +37,50 @@
   width: 100%;
 }
 
+/* ── Premium Logo Wordmark ──────────────────────────── */
+.logo-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-main {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  /* Multi-stop gradient for depth */
+  background: linear-gradient(
+    135deg,
+    #3a3530 0%,
+    #6fa664 50%,
+    #b8714f 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Soft outer glow that acts as a "3D" depth cue */
+  filter: drop-shadow(0 2px 6px rgba(111,166,100,0.25))
+          drop-shadow(0 1px 2px rgba(58,53,48,0.15));
+  user-select: none;
+}
+
+/* Minimal decorative dot accent */
+.logo-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-clay);
+  box-shadow: 0 2px 6px rgba(184, 113, 79, 0.5);
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
 .sidebar-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--text-main);
+  /* Fallback for old code – kept for safety */
+  font-size: 1.55rem;
+  font-weight: 700;
   letter-spacing: -0.04em;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .title-edit-btn {
@@ -181,6 +219,45 @@
 .delete-cat-btn:hover {
   background-color: #fee2e2;
   color: #ef4444;
+}
+
+/* ── Color picker popover ─────────────────────────── */
+.color-popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  display: flex;
+  gap: 7px;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--shadow-hover);
+  z-index: 100;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.color-swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.color-swatch.selected {
+  border-color: var(--text-main);
+  transform: scale(1.15);
+}
+
+/* Make the category item the anchor for the absolutely positioned popover */
+.category-item {
+  position: relative;
 }
 
 /* Add category controls */

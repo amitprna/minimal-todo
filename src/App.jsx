@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { Plus, Edit3, Trash2 } from 'lucide-react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { Plus, Edit3, Trash2, Palette } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import TaskList from './components/TaskList'
@@ -13,6 +13,16 @@ const CATEGORY_COLORS = [
   'var(--color-clay)',
   'var(--color-rose)',
   'var(--color-peach)',
+];
+
+// Resolved hex-like values for the color swatch display
+const COLOR_SWATCHES = [
+  { label: 'Sage',  value: 'var(--color-sage)',  hex: '#6fa664' },
+  { label: 'Slate', value: 'var(--color-slate)', hex: '#6d8fa3' },
+  { label: 'Sand',  value: 'var(--color-sand)',  hex: '#c4aa8f' },
+  { label: 'Clay',  value: 'var(--color-clay)',  hex: '#b8714f' },
+  { label: 'Rose',  value: 'var(--color-rose)',  hex: '#c8788a' },
+  { label: 'Peach', value: 'var(--color-peach)', hex: '#e88a66' },
 ];
 
 const initialCategories = [
@@ -59,12 +69,13 @@ function App() {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingCategoryValue, setEditingCategoryValue] = useState('');
+  const [colorPickerCatId, setColorPickerCatId] = useState(null); // which cat is showing the palette
 
   const [tasks, setTasks] = useLocalStorage('japandi-tasks', []);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  // Note panel is per-category
-  const [notesPanelOpen, setNotesPanelOpen] = useState(false);
+  // Notes panel is open by default
+  const [notesPanelOpen, setNotesPanelOpen] = useState(true);
 
   // Modal for category deletion
   const [deletingCategory, setDeletingCategory] = useState(null);
@@ -106,7 +117,13 @@ function App() {
 
   const confirmDeleteCategory = (e, id) => {
     e.stopPropagation();
+    setColorPickerCatId(null);
     setDeletingCategory(categories.find(c => c.id === id));
+  };
+
+  const changeCategoryColor = (catId, colorValue) => {
+    setCategories(categories.map(c => c.id === catId ? { ...c, color: colorValue } : c));
+    setColorPickerCatId(null);
   };
 
   const deleteCategory = () => {
@@ -172,9 +189,12 @@ function App() {
             />
           ) : (
             <div className="sidebar-title-row">
-              <h2 className="sidebar-title">{globalTitle}</h2>
+              <div className="logo-wordmark">
+                <span className="logo-main">{globalTitle}</span>
+                <span className="logo-dot" />
+              </div>
               <button className="title-edit-btn" onClick={() => { setIsEditingTitle(true); setEditTitleValue(globalTitle); }} title="Rename">
-                <Edit3 size={14} />
+                <Edit3 size={13} />
               </button>
             </div>
           )}
@@ -185,7 +205,7 @@ function App() {
             <div
               key={category.id}
               className={`category-item ${activeCategory === category.id ? 'active' : ''}`}
-              onClick={() => { setActiveCategory(category.id); setNotesPanelOpen(false); }}
+              onClick={() => { setActiveCategory(category.id); setColorPickerCatId(null); }}
             >
               <div className="cat-main">
                 <div className="category-color-dot" style={{ backgroundColor: category.color }} />
@@ -207,10 +227,28 @@ function App() {
                 <button className="cat-action-btn" onClick={(e) => startEditCategory(e, category)} title="Rename">
                   <Edit3 size={13} />
                 </button>
+                <button className="cat-action-btn" onClick={(e) => { e.stopPropagation(); setColorPickerCatId(colorPickerCatId === category.id ? null : category.id); }} title="Change color">
+                  <Palette size={13} />
+                </button>
                 <button className="cat-action-btn delete-cat-btn" onClick={(e) => confirmDeleteCategory(e, category.id)} title="Delete">
                   <Trash2 size={13} />
                 </button>
               </div>
+
+              {/* Inline color picker popover */}
+              {colorPickerCatId === category.id && (
+                <div className="color-popover animate-in" onClick={e => e.stopPropagation()}>
+                  {COLOR_SWATCHES.map(swatch => (
+                    <button
+                      key={swatch.label}
+                      className={`color-swatch ${category.color === swatch.value ? 'selected' : ''}`}
+                      style={{ backgroundColor: swatch.hex }}
+                      onClick={() => changeCategoryColor(category.id, swatch.value)}
+                      title={swatch.label}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ))}
 
