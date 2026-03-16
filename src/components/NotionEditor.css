@@ -12,13 +12,13 @@
 }
 
 /* Placeholder shown when editor is empty */
-.notion-editor:empty::before,
-.notion-editor:has(p:only-child br):before {
+.notion-editor[data-empty="true"]::before {
   content: attr(data-placeholder);
   color: var(--text-muted);
   font-style: italic;
   font-weight: 300;
   pointer-events: none;
+  position: absolute; /* so typing starts at the same spot */
 }
 
 /* Block types */

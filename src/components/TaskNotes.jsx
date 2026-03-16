@@ -21,7 +21,7 @@ export default function TaskNotes({ task, onClose, onSaveNotes, categoryColor })
         <NotionEditor
           initialContent={task.notes || ''}
           onSave={(text) => onSaveNotes(task.id, text)}
-          placeholder="Type '# ' for heading, '* ' for bullet, '> ' for quote…"
+          placeholder="Markdown supported..."
         />
       </div>
     </div>

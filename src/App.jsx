@@ -189,42 +189,46 @@ function App() {
     setCategoryNotes(prev => ({ ...prev, [catId]: notes }));
   };
 
-  // --- Category drag-and-drop ---
-  const catDragIdRef     = useRef(null);
-  const [catDraggingId, setCatDraggingId] = useState(null);
-  const [catDragOverId, setCatDragOverId] = useState(null);
+  // --- Category drag-and-drop (mirrors TaskList position-aware logic) ---
+  const catDragIdRef  = useRef(null);
+  const [catDragging, setCatDragging]   = useState(null); // id
+  const [catDropTarget, setCatDropTarget] = useState(null); // { id, position }
 
   const handleCatDragStart = (e, id) => {
     catDragIdRef.current = id;
-    setCatDraggingId(id);
+    setCatDragging(id);
     e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleCatDragOver = (e, id) => {
     e.preventDefault();
-    if (id !== catDragIdRef.current) setCatDragOverId(id);
+    if (id === catDragIdRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const position = e.clientY < rect.top + rect.height / 2 ? 'top' : 'bottom';
+    setCatDropTarget({ id, position });
   };
 
   const handleCatDrop = (e, targetId) => {
     e.preventDefault();
     const fromId = catDragIdRef.current;
-    if (!fromId || fromId === targetId) return;
+    if (!fromId || fromId === targetId) { resetCatDrag(); return; }
     const fromIdx = categories.findIndex(c => c.id === fromId);
-    const toIdx   = categories.findIndex(c => c.id === targetId);
     const reordered = [...categories];
     const [moved] = reordered.splice(fromIdx, 1);
-    reordered.splice(toIdx, 0, moved);
+    const newToIdx = reordered.findIndex(c => c.id === targetId);
+    const insertAt = catDropTarget?.position === 'top' ? newToIdx : newToIdx + 1;
+    reordered.splice(insertAt, 0, moved);
     setCategories(reordered);
-    catDragIdRef.current = null;
-    setCatDraggingId(null);
-    setCatDragOverId(null);
+    resetCatDrag();
   };
 
-  const handleCatDragEnd = () => {
+  const resetCatDrag = () => {
     catDragIdRef.current = null;
-    setCatDraggingId(null);
-    setCatDragOverId(null);
+    setCatDragging(null);
+    setCatDropTarget(null);
   };
+
+  const handleCatDragEnd = resetCatDrag;
 
   // --- Task reorder ---
   const handleReorderTasks = (newOrderedCategoryTasks) => {
@@ -263,10 +267,13 @@ function App() {
           {categories.map(category => (
             <div
               key={category.id}
-              className={`category-item ${
-                activeCategory === category.id ? 'active' : ''} ${
-                catDraggingId === category.id ? 'cat-dragging' : ''} ${
-                catDragOverId === category.id && catDraggingId !== category.id ? 'cat-drag-over' : ''}`}
+              className={[
+                'category-item',
+                activeCategory === category.id ? 'active' : '',
+                catDragging === category.id ? 'cat-dragging' : '',
+                catDropTarget?.id === category.id && catDropTarget?.position === 'top' && catDragging !== category.id ? 'cat-drop-top' : '',
+                catDropTarget?.id === category.id && catDropTarget?.position === 'bottom' && catDragging !== category.id ? 'cat-drop-bottom' : '',
+              ].filter(Boolean).join(' ')}
               draggable
               onDragStart={(e) => handleCatDragStart(e, category.id)}
               onDragOver={(e)  => handleCatDragOver(e,  category.id)}

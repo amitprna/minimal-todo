@@ -9,14 +9,20 @@ import './NotionEditor.css';
 export default function NotionEditor({ initialContent, onSave, placeholder }) {
   const editorRef = useRef(null);
 
-  // Initialise content — tell browser to wrap paragraphs in <p>
+  // Initialise content
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
     document.execCommand('defaultParagraphSeparator', false, 'p');
-    el.innerHTML = markdownToBlocks(initialContent || '');
+    if (initialContent) {
+      el.innerHTML = markdownToBlocks(initialContent);
+      el.removeAttribute('data-empty');
+    } else {
+      // Leave truly empty so the CSS placeholder shows immediately
+      el.setAttribute('data-empty', 'true');
+    }
     placeCursorAtEnd(el);
-  }, []); // only on mount
+  }, []);
 
   // Auto-format transformations on keydown
   const handleKeyDown = useCallback((e) => {
@@ -93,8 +99,16 @@ export default function NotionEditor({ initialContent, onSave, placeholder }) {
     const changed = normalizeBlocks(el);
     if (changed) placeCursorAtEnd(el);
     const plain = blocksToMarkdown(el);
+    
+    // Toggle placeholder via data-empty
+    if (plain.trim().length === 0) {
+      el.setAttribute('data-empty', 'true');
+    } else {
+      el.removeAttribute('data-empty');
+    }
+    
     onSave(plain);
-  }, [onSave, normalizeBlocks]);
+  }, [onSave]);
 
   const handlePaste = useCallback((e) => {
     // Paste as plain text to avoid HTML injections

@@ -144,9 +144,14 @@
   cursor: grabbing;
 }
 
-.category-item.cat-drag-over {
-  border-top: 2px solid var(--color-sage);
+.category-item.cat-drop-top {
+  border-top: 2.5px solid var(--color-sage);
   padding-top: 2px;
+}
+
+.category-item.cat-drop-bottom {
+  border-bottom: 2.5px solid var(--color-sage);
+  padding-bottom: 2px;
 }
 
 .cat-main {
