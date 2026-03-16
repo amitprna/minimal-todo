@@ -1,0 +1,96 @@
+/* Notion-style editor surface */
+.notion-editor {
+  flex-grow: 1;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-main);
+  padding: 0.5rem 0.25rem 4rem;
+  cursor: text;
+  min-height: 100px;
+  overflow-y: auto;
+}
+
+/* Placeholder shown when editor is empty */
+.notion-editor:empty::before,
+.notion-editor:has(p:only-child br):before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 300;
+  pointer-events: none;
+}
+
+/* Block types */
+.notion-editor h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 1.25rem 0 0.4rem;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.notion-editor h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 1rem 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.notion-editor h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0.85rem 0 0.3rem;
+}
+
+.notion-editor p {
+  margin: 0 0 0.5rem;
+  color: var(--text-main);
+}
+
+.notion-editor ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0;
+}
+
+.notion-editor ul li::before {
+  content: '•';
+  color: var(--color-clay);
+  font-weight: 700;
+  margin-right: 0.6rem;
+}
+
+.notion-editor ul li,
+.notion-editor ol li {
+  padding: 0.15rem 0;
+  color: var(--text-main);
+}
+
+.notion-editor ol {
+  padding-left: 1.25rem;
+  margin: 0.4rem 0;
+}
+
+.notion-editor blockquote {
+  border-left: 3px solid var(--border-subtle);
+  padding-left: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.75rem 0;
+}
+
+.notion-editor hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 1.25rem 0;
+}
+
+.notion-editor strong { font-weight: 600; }
+.notion-editor em     { font-style: italic; color: var(--text-muted); }
+
+/* Typing caret colour */
+.notion-editor { caret-color: var(--color-clay); }

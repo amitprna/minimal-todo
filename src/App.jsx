@@ -33,22 +33,30 @@ const initialCategories = [
   { id: '5', name: 'Ideas', color: 'var(--color-rose)' }
 ];
 
-// Play a subtle chime sound on task completion
+// Play a bell-like sound on task completion
 const playCompleteSound = () => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1108, ctx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  } catch (e) { /* Ignore if audio not supported */ }
+    const t = ctx.currentTime;
+
+    // Bell = fundamental + harmonics with fast attack, slow exponential decay
+    const frequencies = [523.25, 1046.5, 1568, 2093]; // C5, C6, G6, C7
+    const decayTimes  = [1.2,    0.8,    0.5,   0.3];
+    const volumes     = [0.22,   0.12,   0.07,  0.04];
+
+    frequencies.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(volumes[i], t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + decayTimes[i]);
+      osc.start(t);
+      osc.stop(t + decayTimes[i]);
+    });
+  } catch (e) { /* audio not supported */ }
 };
 
 function App() {
@@ -189,10 +197,7 @@ function App() {
             />
           ) : (
             <div className="sidebar-title-row">
-              <div className="logo-wordmark">
-                <span className="logo-main">{globalTitle}</span>
-                <span className="logo-dot" />
-              </div>
+              <h2 className="sidebar-title">{globalTitle}</h2>
               <button className="title-edit-btn" onClick={() => { setIsEditingTitle(true); setEditTitleValue(globalTitle); }} title="Rename">
                 <Edit3 size={13} />
               </button>
@@ -288,7 +293,7 @@ function App() {
                 title="Toggle Notes"
               >
                 <Edit3 size={18} />
-                <span>{notesPanelOpen ? 'Hide Notes' : 'Notes'}</span>
+                <span>Notes</span>
               </button>
             )}
           </header>

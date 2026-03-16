@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Rounded square background -->
+  <rect width="32" height="32" rx="8" fill="#fcfbfa"/>
+  <!-- Outer card -->
+  <rect x="4" y="4" width="24" height="24" rx="6" fill="#ffffff" stroke="#eae5de" stroke-width="1"/>
+  <!-- Checkmark circle -->
+  <circle cx="16" cy="15" r="7" fill="none" stroke="#6fa664" stroke-width="2"/>
+  <!-- Checkmark tick -->
+  <path d="M12.5 15.2 L14.8 17.5 L19.5 12.5" stroke="#6fa664" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
