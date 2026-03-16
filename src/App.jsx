@@ -33,29 +33,39 @@ const initialCategories = [
   { id: '5', name: 'Ideas', color: 'var(--color-rose)' }
 ];
 
-// Play a bell-like sound on task completion
+// iPhone-style "ding" — single clean C6 tone with fast attack, smooth decay
 const playCompleteSound = () => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const t = ctx.currentTime;
 
-    // Bell = fundamental + harmonics with fast attack, slow exponential decay
-    const frequencies = [523.25, 1046.5, 1568, 2093]; // C5, C6, G6, C7
-    const decayTimes  = [1.2,    0.8,    0.5,   0.3];
-    const volumes     = [0.22,   0.12,   0.07,  0.04];
+    // Primary tone: C6 (1046 Hz) — the core iPhone ding pitch
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1046.5, t);
+    // Fast linear attack to prevent click
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.28, t + 0.008);
+    // Smooth exponential decay like a physical bell
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+    osc.start(t);
+    osc.stop(t + 0.7);
 
-    frequencies.forEach((freq, i) => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, t);
-      gain.gain.setValueAtTime(volumes[i], t);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + decayTimes[i]);
-      osc.start(t);
-      osc.stop(t + decayTimes[i]);
-    });
+    // Subtle harmonic at 2x to add warmth
+    const osc2  = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(2093, t);
+    gain2.gain.setValueAtTime(0, t);
+    gain2.gain.linearRampToValueAtTime(0.08, t + 0.008);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    osc2.start(t);
+    osc2.stop(t + 0.35);
   } catch (e) { /* audio not supported */ }
 };
 
@@ -261,14 +271,13 @@ function App() {
             <div className="add-cat-input-area animate-in">
               <input
                 type="text"
-                placeholder="List name..."
+                placeholder="List name… press Enter"
                 value={newCategoryName}
                 onChange={e => setNewCategoryName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleAddCategory(); if (e.key === 'Escape') setIsAddingCategory(false); }}
                 autoFocus
                 className="add-cat-input"
               />
-              <button className="add-cat-save" onClick={handleAddCategory}>Add</button>
             </div>
           ) : (
             <button className="add-cat-btn" onClick={() => setIsAddingCategory(true)}>
@@ -331,6 +340,7 @@ function App() {
         {notesPanelOpen && currentCategory && (
           <aside className="notes-sidebar animate-in">
             <TaskNotes
+              key={currentCategory.id}
               task={{ id: currentCategory.id, title: `${currentCategory.name} — Notes`, notes: categoryNotes[currentCategory.id] || '' }}
               onClose={() => setNotesPanelOpen(false)}
               onSaveNotes={(id, notes) => handleSaveCategoryNotes(id, notes)}

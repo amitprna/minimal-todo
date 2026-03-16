@@ -9,13 +9,14 @@ import './NotionEditor.css';
 export default function NotionEditor({ initialContent, onSave, placeholder }) {
   const editorRef = useRef(null);
 
-  // Initialise content once
+  // Initialise content — tell browser to wrap paragraphs in <p>
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
-    if (initialContent) {
-      el.innerHTML = markdownToBlocks(initialContent);
-    }
+    // Ensure the browser uses <p> for new paragraphs
+    document.execCommand('defaultParagraphSeparator', false, 'p');
+    // Seed with parsed content or a blank <p> so first line is always a block
+    el.innerHTML = markdownToBlocks(initialContent || '');
     placeCursorAtEnd(el);
   }, []); // only on mount
 
@@ -87,8 +88,29 @@ export default function NotionEditor({ initialContent, onSave, placeholder }) {
   const handleInput = useCallback(() => {
     const el = editorRef.current;
     if (!el) return;
-    // Inline markdown: bold **x**, italic _x__  — parse on every change
-    applyInlineStyles(el);
+
+    // Normalize: browser sometimes inserts bare text nodes or <div>s on the
+    // first keystroke. Wrap them in <p> so auto-format always has a block.
+    let needsCursorRestore = false;
+    el.childNodes.forEach(node => {
+      // bare text node
+      if (node.nodeType === 3) {
+        const p = document.createElement('p');
+        p.textContent = node.textContent;
+        node.replaceWith(p);
+        needsCursorRestore = true;
+      }
+      // Chrome sometimes uses <div> instead of <p>
+      if (node.nodeType === 1 && node.tagName.toLowerCase() === 'div') {
+        const p = document.createElement('p');
+        p.innerHTML = node.innerHTML;
+        node.replaceWith(p);
+        needsCursorRestore = true;
+      }
+    });
+
+    if (needsCursorRestore) placeCursorAtEnd(el);
+
     const plain = blocksToMarkdown(el);
     onSave(plain);
   }, [onSave]);
