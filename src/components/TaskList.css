@@ -11,6 +11,25 @@
   gap: 0.1rem;
 }
 
+/* ── Drag and drop ───────────────────────────────────────────── */
+.task-drag-wrapper {
+  border-radius: 14px;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  cursor: grab;
+}
+
+.task-drag-wrapper:active { cursor: grabbing; }
+
+.task-drag-wrapper.dragging {
+  opacity: 0.35;
+  transform: scale(0.98);
+}
+
+.task-drag-wrapper.drag-over {
+  border-top: 2px solid var(--color-sage);
+  padding-top: 2px;
+}
+
 .empty-state {
   text-align: center;
   color: var(--text-muted);

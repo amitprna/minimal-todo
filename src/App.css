@@ -138,6 +138,17 @@
   box-shadow: var(--shadow-md);
 }
 
+.category-item.cat-dragging {
+  opacity: 0.35;
+  transform: scale(0.97);
+  cursor: grabbing;
+}
+
+.category-item.cat-drag-over {
+  border-top: 2px solid var(--color-sage);
+  padding-top: 2px;
+}
+
 .cat-main {
   display: flex;
   align-items: center;

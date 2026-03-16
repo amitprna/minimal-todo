@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Plus, Edit3, Trash2, Palette } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
@@ -189,6 +189,50 @@ function App() {
     setCategoryNotes(prev => ({ ...prev, [catId]: notes }));
   };
 
+  // --- Category drag-and-drop ---
+  const catDragIdRef     = useRef(null);
+  const [catDraggingId, setCatDraggingId] = useState(null);
+  const [catDragOverId, setCatDragOverId] = useState(null);
+
+  const handleCatDragStart = (e, id) => {
+    catDragIdRef.current = id;
+    setCatDraggingId(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleCatDragOver = (e, id) => {
+    e.preventDefault();
+    if (id !== catDragIdRef.current) setCatDragOverId(id);
+  };
+
+  const handleCatDrop = (e, targetId) => {
+    e.preventDefault();
+    const fromId = catDragIdRef.current;
+    if (!fromId || fromId === targetId) return;
+    const fromIdx = categories.findIndex(c => c.id === fromId);
+    const toIdx   = categories.findIndex(c => c.id === targetId);
+    const reordered = [...categories];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+    setCategories(reordered);
+    catDragIdRef.current = null;
+    setCatDraggingId(null);
+    setCatDragOverId(null);
+  };
+
+  const handleCatDragEnd = () => {
+    catDragIdRef.current = null;
+    setCatDraggingId(null);
+    setCatDragOverId(null);
+  };
+
+  // --- Task reorder ---
+  const handleReorderTasks = (newOrderedCategoryTasks) => {
+    // Replace the tasks for the current category in the global list, preserving order of other categories
+    const otherTasks = tasks.filter(t => t.categoryId !== activeCategory);
+    setTasks([...otherTasks, ...newOrderedCategoryTasks]);
+  };
+
   // --- Render ---
   return (
     <div className="app-container">
@@ -219,7 +263,15 @@ function App() {
           {categories.map(category => (
             <div
               key={category.id}
-              className={`category-item ${activeCategory === category.id ? 'active' : ''}`}
+              className={`category-item ${
+                activeCategory === category.id ? 'active' : ''} ${
+                catDraggingId === category.id ? 'cat-dragging' : ''} ${
+                catDragOverId === category.id && catDraggingId !== category.id ? 'cat-drag-over' : ''}`}
+              draggable
+              onDragStart={(e) => handleCatDragStart(e, category.id)}
+              onDragOver={(e)  => handleCatDragOver(e,  category.id)}
+              onDrop={(e)      => handleCatDrop(e,      category.id)}
+              onDragEnd={handleCatDragEnd}
               onClick={() => { setActiveCategory(category.id); setColorPickerCatId(null); }}
             >
               <div className="cat-main">
@@ -295,16 +347,6 @@ function App() {
               <div className="header-color-bar" style={{ backgroundColor: currentCategory?.color }} />
               <h1>{currentCategory?.name || 'Select a list'}</h1>
             </div>
-            {currentCategory && (
-              <button
-                className={`notes-toggle-btn ${notesPanelOpen ? 'active' : ''}`}
-                onClick={() => setNotesPanelOpen(p => !p)}
-                title="Toggle Notes"
-              >
-                <Edit3 size={18} />
-                <span>Notes</span>
-              </button>
-            )}
           </header>
 
           <div className="add-task-container animate-in" style={{ animationDelay: '0.1s' }}>
@@ -329,6 +371,7 @@ function App() {
                 onTogglePin={(id) => updateTaskField(id, 'pinned', !tasks.find(t => t.id === id).pinned)}
                 onDelete={(id) => setTasks(tasks.filter(t => t.id !== id))}
                 onUpdateSubtasks={(id, st) => updateTaskField(id, 'subtasks', st)}
+                onReorder={handleReorderTasks}
               />
             ) : (
               <div className="empty-state">Select or create a list to begin.</div>
