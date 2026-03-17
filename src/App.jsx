@@ -287,7 +287,8 @@ function App() {
         <nav className="category-list">
           {categories.map(category => {
             const currentCatTasks = tasks.filter(t => t.categoryId === category.id);
-            const pinnedCount = currentCatTasks.filter(t => t.pinned && !t.completed).length;
+            const incompleteTasks = currentCatTasks.filter(t => !t.completed);
+            const pinnedCount = incompleteTasks.filter(t => t.pinned).length;
 
             return (
             <div
@@ -324,7 +325,7 @@ function App() {
                 {!editingCategoryId && (
                   <div className="cat-badges">
                     {pinnedCount > 0 && <Pin size={12} className="cat-pin-badge" />}
-                    <span className="cat-task-count">{currentCatTasks.length}</span>
+                    <span className="cat-task-count">{incompleteTasks.length}</span>
                   </div>
                 )}
               </div>
