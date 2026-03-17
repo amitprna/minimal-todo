@@ -207,6 +207,29 @@
   text-overflow: ellipsis;
 }
 
+.cat-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.cat-pin-badge {
+  color: var(--color-rose);
+  fill: var(--color-rose);
+}
+
+.cat-task-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 0.1rem 0.4rem;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+
 .cat-rename-input {
   font-size: 0.9rem;
   background: var(--bg-main);
@@ -230,6 +253,12 @@
 .category-item:hover .cat-actions,
 .category-item.active .cat-actions {
   opacity: 1;
+}
+
+/* Hide the badges when action buttons are revealed on hover/active */
+.category-item:hover .cat-badges,
+.category-item.active .cat-badges {
+  display: none;
 }
 
 .cat-action-btn {
@@ -391,6 +420,25 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.header-notes-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.header-notes-btn:hover {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Vertical colored bar next to the list title (requested highlight) */

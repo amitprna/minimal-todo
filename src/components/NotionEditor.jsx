@@ -138,17 +138,29 @@ export default function NotionEditor({ initialContent, onSave, placeholder }) {
 // Called before keydown handling AND on input to catch browser quirks.
 function normalizeBlocks(el) {
   let changed = false;
+  const sel = window.getSelection();
+  const anchorNode = sel?.anchorNode;
+  const anchorOffset = sel?.anchorOffset;
+
   Array.from(el.childNodes).forEach(node => {
     if (node.nodeType === 3) {
+      const isSelected = anchorNode === node;
       const p = document.createElement('p');
       p.textContent = node.textContent;
       node.replaceWith(p);
       changed = true;
+      if (isSelected && p.firstChild) {
+        sel.collapse(p.firstChild, anchorOffset);
+      }
     } else if (node.nodeType === 1 && node.tagName.toLowerCase() === 'div') {
+      const isSelected = anchorNode && node.contains(anchorNode);
       const p = document.createElement('p');
       p.innerHTML = node.innerHTML;
       node.replaceWith(p);
       changed = true;
+      if (isSelected) {
+        placeCursorAtEnd(p);
+      }
     }
   });
   return changed;

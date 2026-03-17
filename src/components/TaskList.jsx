@@ -10,6 +10,7 @@ export default function TaskList({
   onTogglePin, 
   onDelete,
   onUpdateSubtasks,
+  onUpdateTitle,
   onReorder
 }) {
   const [showCompleted, setShowCompleted] = useState(false);
@@ -97,6 +98,7 @@ export default function TaskList({
           onTogglePin={onTogglePin}
           onDelete={onDelete}
           onUpdateSubtasks={onUpdateSubtasks}
+          onUpdateTitle={onUpdateTitle}
         />
       </div>
     );

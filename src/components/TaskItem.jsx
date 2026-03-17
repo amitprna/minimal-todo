@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Circle, ChevronDown, ChevronRight, Pin, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronDown, ChevronRight, Pin, Plus, Trash2, Edit3 } from 'lucide-react';
 import './TaskItem.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,11 +10,23 @@ export default function TaskItem({
   onTogglePin, 
   onDelete,
   onUpdateSubtasks,
+  onUpdateTitle,
   onSelectTask,
   isSelected
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(task.title);
+
+  const saveEdit = () => {
+    if (editTitle.trim() && editTitle.trim() !== task.title) {
+      onUpdateTitle(task.id, editTitle.trim());
+    } else {
+      setEditTitle(task.title);
+    }
+    setIsEditing(false);
+  };
 
   const toggleSubtask = (subtaskId) => {
     const updatedSubtasks = task.subtasks.map(st => 
@@ -64,19 +76,45 @@ export default function TaskItem({
         </button>
 
         {/* Title area */}
-        <div className="task-content" onClick={() => setIsExpanded(!isExpanded)}>
-          <span className={`task-title ${task.completed ? 'text-muted strike' : ''}`}>
-            {task.title}
-          </span>
-          {hasSubtasks && (
-            <span className="subtask-indicator">
-              {completedSubtasks}/{task.subtasks.length}
-            </span>
+        <div className="task-content">
+          {isEditing ? (
+            <input 
+              type="text"
+              className="task-edit-input"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onBlur={saveEdit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') saveEdit();
+                if (e.key === 'Escape') { setEditTitle(task.title); setIsEditing(false); }
+              }}
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <div className="task-title-wrapper" onClick={() => setIsExpanded(!isExpanded)}>
+              <span className={`task-title ${task.completed ? 'text-muted strike' : ''}`}>
+                {task.title}
+              </span>
+              {hasSubtasks && (
+                <span className="subtask-indicator">
+                  {completedSubtasks}/{task.subtasks.length}
+                </span>
+              )}
+            </div>
           )}
         </div>
 
         {/* Actions */}
         <div className="task-actions">
+          <button 
+            className="action-btn edit-btn"
+            onClick={(e) => { e.stopPropagation(); setIsEditing(true); setIsExpanded(false); }}
+            aria-label="Edit task"
+            title="Edit"
+          >
+            <Edit3 size={18} />
+          </button>
           <button 
             className={`action-btn ${task.pinned ? 'active-pin' : ''}`}
             onClick={(e) => { e.stopPropagation(); onTogglePin(task.id); }}

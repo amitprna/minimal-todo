@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Palette, Moon, Sun } from 'lucide-react'
+import { Plus, Edit3, Trash2, Palette, Moon, Sun, FileText, Pin } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import TaskList from './components/TaskList'
@@ -103,8 +103,17 @@ function App() {
   const [tasks, setTasks] = useLocalStorage('japandi-tasks', []);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  // Notes panel is open by default
-  const [notesPanelOpen, setNotesPanelOpen] = useState(true);
+  // Notes panel open state per category (true by default if undefined)
+  const [categoryNotesOpen, setCategoryNotesOpen] = useLocalStorage('japandi-notes-open-state', {});
+  const isNotesPanelOpen = activeCategory ? categoryNotesOpen[activeCategory] !== false : false;
+
+  const toggleNotesPanel = () => {
+    if (!activeCategory) return;
+    setCategoryNotesOpen(prev => ({
+      ...prev,
+      [activeCategory]: prev[activeCategory] === false ? true : false
+    }));
+  };
 
   // Modal for category deletion
   const [deletingCategory, setDeletingCategory] = useState(null);
@@ -276,7 +285,11 @@ function App() {
           </div>
 
         <nav className="category-list">
-          {categories.map(category => (
+          {categories.map(category => {
+            const currentCatTasks = tasks.filter(t => t.categoryId === category.id);
+            const pinnedCount = currentCatTasks.filter(t => t.pinned && !t.completed).length;
+
+            return (
             <div
               key={category.id}
               className={[
@@ -308,6 +321,12 @@ function App() {
                 ) : (
                   <span className="cat-name">{category.name}</span>
                 )}
+                {!editingCategoryId && (
+                  <div className="cat-badges">
+                    {pinnedCount > 0 && <Pin size={12} className="cat-pin-badge" />}
+                    <span className="cat-task-count">{currentCatTasks.length}</span>
+                  </div>
+                )}
               </div>
               <div className="cat-actions">
                 <button className="cat-action-btn" onClick={(e) => startEditCategory(e, category)} title="Rename">
@@ -336,7 +355,8 @@ function App() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
 
           {isAddingCategory ? (
             <div className="add-cat-input-area animate-in">
@@ -371,12 +391,21 @@ function App() {
 
       {/* Main Content Split View */}
       <div className="main-wrapper">
-        <main className={`main-content ${notesPanelOpen ? 'split-active' : ''}`}>
+        <main className={`main-content ${isNotesPanelOpen ? 'split-active' : ''}`}>
           <header className="header animate-in">
             <div className="header-left">
               <div className="header-color-bar" style={{ backgroundColor: currentCategory?.color }} />
               <h1>{currentCategory?.name || 'Select a list'}</h1>
             </div>
+            {currentCategory && !isNotesPanelOpen && (
+              <button 
+                className="icon-btn header-notes-btn" 
+                onClick={toggleNotesPanel}
+                title="Open Notes"
+              >
+                <FileText size={20} />
+              </button>
+            )}
           </header>
 
           <div className="add-task-container animate-in" style={{ animationDelay: '0.1s' }}>
@@ -401,6 +430,7 @@ function App() {
                 onTogglePin={(id) => updateTaskField(id, 'pinned', !tasks.find(t => t.id === id).pinned)}
                 onDelete={(id) => setTasks(tasks.filter(t => t.id !== id))}
                 onUpdateSubtasks={(id, st) => updateTaskField(id, 'subtasks', st)}
+                onUpdateTitle={(id, title) => updateTaskField(id, 'title', title)}
                 onReorder={handleReorderTasks}
               />
             ) : (
@@ -410,12 +440,12 @@ function App() {
         </main>
 
         {/* Category-level Markdown Notes Panel */}
-        {notesPanelOpen && currentCategory && (
+        {isNotesPanelOpen && currentCategory && (
           <aside className="notes-sidebar animate-in">
             <TaskNotes
               key={currentCategory.id}
               task={{ id: currentCategory.id, title: `${currentCategory.name} — Notes`, notes: categoryNotes[currentCategory.id] || '' }}
-              onClose={() => setNotesPanelOpen(false)}
+              onClose={toggleNotesPanel}
               onSaveNotes={(id, notes) => handleSaveCategoryNotes(id, notes)}
               categoryColor={currentCategory.color}
             />
