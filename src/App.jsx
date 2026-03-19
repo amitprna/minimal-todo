@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { Plus, Edit3, Trash2, Palette, Moon, Sun, FileText, Pin } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { useCloudStore } from './hooks/useCloudStore'
 import TaskList from './components/TaskList'
 import TaskNotes from './components/TaskNotes'
 import './App.css'
@@ -25,7 +26,7 @@ const COLOR_SWATCHES = [
   { label: 'Peach', value: 'var(--color-peach)', hex: '#e88a66' },
 ];
 
-const initialCategories = [
+export const initialCategories = [
   { id: '1', name: 'Personal', color: 'var(--color-sage)' },
   { id: '2', name: 'Work', color: 'var(--color-slate)' },
   { id: '3', name: 'Groceries', color: 'var(--color-sand)' },
@@ -85,14 +86,19 @@ function App() {
     }
   }, [isDarkMode]);
 
-  const [categories, setCategories] = useLocalStorage('japandi-categories', initialCategories);
-  const [activeCategory, setActiveCategory] = useState(() => {
-    const cats = JSON.parse(localStorage.getItem('japandi-categories') || 'null');
-    return (cats && cats[0]?.id) || initialCategories[0].id;
-  });
+  const {
+    categories, setCategories,
+    tasks, setTasks,
+    categoryNotes, setCategoryNotes,
+    loading
+  } = useCloudStore();
 
-  // Per-category notes stored by category id
-  const [categoryNotes, setCategoryNotes] = useLocalStorage('japandi-cat-notes', {});
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // Auto-select first category if none selected
+  useEffect(() => {
+    if (!activeCategory && categories.length > 0) setActiveCategory(categories[0].id);
+  }, [categories, activeCategory]);
 
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -100,7 +106,6 @@ function App() {
   const [editingCategoryValue, setEditingCategoryValue] = useState('');
   const [colorPickerCatId, setColorPickerCatId] = useState(null); // which cat is showing the palette
 
-  const [tasks, setTasks] = useLocalStorage('japandi-tasks', []);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
   // Notes panel open state per category (true by default if undefined)
@@ -258,6 +263,14 @@ function App() {
   };
 
   // --- Render ---
+  if (loading) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)', color: 'var(--text-muted)' }}>
+        Loading moments...
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Sidebar */}

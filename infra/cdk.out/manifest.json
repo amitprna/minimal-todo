@@ -1,0 +1,397 @@
+{
+  "version": "39.0.0",
+  "artifacts": {
+    "TodoStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "TodoStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "TodoStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://905418342208/us-east-1",
+      "properties": {
+        "templateFile": "TodoStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::905418342208:role/cdk-hnb659fds-deploy-role-905418342208-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::905418342208:role/cdk-hnb659fds-cfn-exec-role-905418342208-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-905418342208-us-east-1/29d636272d2f69ae7a0428db0ea786937bdc585798b5f808737daa4fb6439681.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "TodoStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::905418342208:role/cdk-hnb659fds-lookup-role-905418342208-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "TodoStack.assets"
+      ],
+      "metadata": {
+        "/TodoStack/TodoUserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoUserPool31A47EB9"
+          }
+        ],
+        "/TodoStack/TodoUserPoolClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoUserPoolClient0924457D"
+          }
+        ],
+        "/TodoStack/TodoTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "TodoTable585F1D6B"
+            }
+          }
+        ],
+        "/TodoStack/TodoTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoTable585F1D6B"
+          }
+        ],
+        "/TodoStack/CategoriesFn/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CategoriesFnServiceRole645A969C"
+          }
+        ],
+        "/TodoStack/CategoriesFn/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CategoriesFnServiceRoleDefaultPolicy8A4F29F3"
+          }
+        ],
+        "/TodoStack/CategoriesFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CategoriesFn9A05718C"
+          }
+        ],
+        "/TodoStack/TasksFn/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TasksFnServiceRole329EB481"
+          }
+        ],
+        "/TodoStack/TasksFn/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TasksFnServiceRoleDefaultPolicyC8B1214B"
+          }
+        ],
+        "/TodoStack/TasksFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TasksFnF798CBC2"
+          }
+        ],
+        "/TodoStack/NotesFn/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotesFnServiceRole962C639B"
+          }
+        ],
+        "/TodoStack/NotesFn/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotesFnServiceRoleDefaultPolicyC9A26428"
+          }
+        ],
+        "/TodoStack/NotesFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotesFn5E7C41CD"
+          }
+        ],
+        "/TodoStack/TodoApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApi145E2E30"
+          }
+        ],
+        "/TodoStack/TodoApi/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiDefaultStage5B325C9F"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--categories/CategoriesIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETcategoriesCategoriesIntegration5962A3DF"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--categories/CategoriesIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETcategoriesCategoriesIntegrationPermission65F11C82"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--categories/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETcategoriesED9669D6"
+          }
+        ],
+        "/TodoStack/TodoApi/CognitoAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiCognitoAuthorizer76D497FB"
+          }
+        ],
+        "/TodoStack/TodoApi/POST--categories/CategoriesIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPOSTcategoriesCategoriesIntegrationPermission734373FA"
+          }
+        ],
+        "/TodoStack/TodoApi/POST--categories/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPOSTcategoriesE62147ED"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--categories--{id}/CategoriesIdIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTcategoriesidCategoriesIdIntegration5122DAB0"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--categories--{id}/CategoriesIdIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTcategoriesidCategoriesIdIntegrationPermissionEAECB3A4"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--categories--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTcategoriesid2B0224EB"
+          }
+        ],
+        "/TodoStack/TodoApi/DELETE--categories--{id}/CategoriesIdIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiDELETEcategoriesidCategoriesIdIntegrationPermissionA94372C7"
+          }
+        ],
+        "/TodoStack/TodoApi/DELETE--categories--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiDELETEcategoriesid1E516A54"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--tasks/TasksIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETtasksTasksIntegrationB6463C84"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--tasks/TasksIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETtasksTasksIntegrationPermission37B570C9"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--tasks/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETtasksC6F2EB6E"
+          }
+        ],
+        "/TodoStack/TodoApi/POST--tasks/TasksIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPOSTtasksTasksIntegrationPermissionBEA98136"
+          }
+        ],
+        "/TodoStack/TodoApi/POST--tasks/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPOSTtasksEE406A76"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--tasks--{id}/TasksIdIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTtasksidTasksIdIntegrationCEA4E0B2"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--tasks--{id}/TasksIdIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTtasksidTasksIdIntegrationPermission3383C456"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--tasks--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTtasksid8AEC93BD"
+          }
+        ],
+        "/TodoStack/TodoApi/DELETE--tasks--{id}/TasksIdIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiDELETEtasksidTasksIdIntegrationPermission8F033F04"
+          }
+        ],
+        "/TodoStack/TodoApi/DELETE--tasks--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiDELETEtasksidF8011CCA"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--notes--{categoryId}/NotesIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETnotescategoryIdNotesIntegrationA6C16A34"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--notes--{categoryId}/NotesIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETnotescategoryIdNotesIntegrationPermissionBA33D6D2"
+          }
+        ],
+        "/TodoStack/TodoApi/GET--notes--{categoryId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiGETnotescategoryIdEC0D1AB4"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--notes--{categoryId}/NotesIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTnotescategoryIdNotesIntegrationPermission5B393692"
+          }
+        ],
+        "/TodoStack/TodoApi/PUT--notes--{categoryId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TodoApiPUTnotescategoryIdC9D4CC69"
+          }
+        ],
+        "/TodoStack/FrontendBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketEFE2E19C"
+          }
+        ],
+        "/TodoStack/FrontendBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketPolicy1DFF75D9"
+          }
+        ],
+        "/TodoStack/FrontendBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketAutoDeleteObjectsCustomResourceDB860B32"
+          }
+        ],
+        "/TodoStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/TodoStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/TodoStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/TodoStack/FrontendOAC/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendOACB94BB8F4"
+          }
+        ],
+        "/TodoStack/FrontendDistribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendDistributionE6EAF405"
+          }
+        ],
+        "/TodoStack/CloudFrontURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontURL"
+          }
+        ],
+        "/TodoStack/S3BucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3BucketName"
+          }
+        ],
+        "/TodoStack/CloudFrontDistributionId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontDistributionId"
+          }
+        ],
+        "/TodoStack/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/TodoStack/UserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId"
+          }
+        ],
+        "/TodoStack/ApiEndpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiEndpoint"
+          }
+        ],
+        "/TodoStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/TodoStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/TodoStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "TodoStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

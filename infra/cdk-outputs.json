@@ -1,0 +1,10 @@
+{
+  "TodoStack": {
+    "UserPoolClientId": "tl1jkn0cs7jobvlc5dm48e485",
+    "CloudFrontURL": "https://d3iklzumyggx8e.cloudfront.net",
+    "UserPoolId": "us-east-1_eJLcRUp4F",
+    "CloudFrontDistributionId": "E1TNHTR2T9QFEK",
+    "ApiEndpoint": "https://ttr1u0vcjd.execute-api.us-east-1.amazonaws.com",
+    "S3BucketName": "todo-frontend-905418342208-us-east-1"
+  }
+}
