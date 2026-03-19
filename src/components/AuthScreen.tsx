@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import './AuthScreen.css';
 
 type Screen = 'signin' | 'signup' | 'confirm' | 'req_reset' | 'confirm_reset';
 
-export default function AuthScreen() {
+interface AuthScreenProps {
+  onContinueAsGuest?: () => void;
+}
+
+export default function AuthScreen({ onContinueAsGuest }: AuthScreenProps) {
   const { signIn, signUp, confirmCode, reqPasswordReset, confirmPasswordReset, error } = useAuth();
   const [screen, setScreen] = useState<Screen>('signin');
   const [email, setEmail] = useState('');
@@ -12,94 +16,49 @@ export default function AuthScreen() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const displayError = localError || error;
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const wrap = async (fn: () => Promise<void>) => {
     setLocalError('');
     setLoading(true);
-    try {
-      await signIn(email, password);
-    } catch {
-      // error shown via auth context
-    } finally {
-      setLoading(false);
-    }
+    try { await fn(); } catch { /* error shown via auth context */ } finally { setLoading(false); }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignIn = (e: React.FormEvent) => { e.preventDefault(); wrap(() => signIn(email, password)); };
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    setLocalError('');
     if (password.length < 8) { setLocalError('Password must be at least 8 characters.'); return; }
-    setLoading(true);
-    try {
-      const next = await signUp(email, password);
-      if (next === 'CONFIRM_SIGN_UP') setScreen('confirm');
-    } catch {
-      // error shown via auth context
-    } finally {
-      setLoading(false);
-    }
+    wrap(async () => { const next = await signUp(email, password); if (next === 'CONFIRM_SIGN_UP') setScreen('confirm'); });
   };
-
-  const handleConfirm = async (e: React.FormEvent) => {
+  const handleConfirm = (e: React.FormEvent) => { e.preventDefault(); wrap(async () => { await confirmCode(email, code); await signIn(email, password); }); };
+  const handleReqReset = (e: React.FormEvent) => { e.preventDefault(); wrap(async () => { await reqPasswordReset(email); setScreen('confirm_reset'); }); };
+  const handleConfirmReset = (e: React.FormEvent) => {
     e.preventDefault();
-    setLocalError('');
-    setLoading(true);
-    try {
-      await confirmCode(email, code);
-      // After confirming, sign in automatically
-      await signIn(email, password);
-    } catch {
-      // error shown via auth context
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReqReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalError('');
-    setLoading(true);
-    try {
-      await reqPasswordReset(email);
-      setScreen('confirm_reset');
-    } catch {
-      // error shown via auth context
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConfirmReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalError('');
     if (password.length < 8) { setLocalError('New password must be at least 8 characters.'); return; }
-    setLoading(true);
-    try {
-      await confirmPasswordReset(email, code, password);
-      // Auto sign in with new password
-      await signIn(email, password);
-    } catch {
-      // error shown via auth context
-    } finally {
-      setLoading(false);
-    }
+    wrap(async () => { await confirmPasswordReset(email, code, password); await signIn(email, password); });
   };
 
   return (
-    <div className="auth-wrapper">
+    <div className={`auth-wrapper ${mounted ? 'auth-mounted' : ''}`}>
+      {/* Animated background particles */}
+      <div className="auth-bg-particles" aria-hidden="true">
+        {[...Array(6)].map((_, i) => <div key={i} className={`auth-particle auth-particle-${i + 1}`} />)}
+      </div>
+
       <div className="auth-card">
+        {/* Logo — only "Minimal-ToDo" branded, highlighted */}
         <div className="auth-logo">
           <span className="auth-logo-dot" />
-          <span className="auth-logo-text">Minimal-ToDo</span>
+          <span className="auth-logo-text"><strong>Minimal-ToDo</strong></span>
         </div>
 
         {screen === 'signin' && (
           <>
-            <h1 className="auth-title">Welcome back</h1>
-            <p className="auth-subtitle">Sign in to your moments</p>
+            <h1 className="auth-title">Sign in</h1>
             <form onSubmit={handleSignIn} className="auth-form">
               <input className="auth-input" type="email" placeholder="Email" value={email}
                 onChange={e => setEmail(e.target.value)} required autoFocus />
@@ -122,7 +81,6 @@ export default function AuthScreen() {
         {screen === 'signup' && (
           <>
             <h1 className="auth-title">Create account</h1>
-            <p className="auth-subtitle">Start tracking your moments</p>
             <form onSubmit={handleSignUp} className="auth-form">
               <input className="auth-input" type="email" placeholder="Email" value={email}
                 onChange={e => setEmail(e.target.value)} required autoFocus />
@@ -163,11 +121,11 @@ export default function AuthScreen() {
                 onChange={e => setEmail(e.target.value)} required autoFocus />
               {displayError && <p className="auth-error">{displayError}</p>}
               <button className="auth-btn" type="submit" disabled={loading}>
-                {loading ? 'Sending link…' : 'Send code'}
+                {loading ? 'Sending…' : 'Send code'}
               </button>
             </form>
             <p className="auth-switch">
-              Remember your password? <button className="auth-link" onClick={() => setScreen('signin')}>Sign in</button>
+              Remember it? <button className="auth-link" onClick={() => setScreen('signin')}>Sign in</button>
             </p>
           </>
         )}
@@ -187,6 +145,13 @@ export default function AuthScreen() {
               </button>
             </form>
           </>
+        )}
+
+        {/* Guest mode option — only on sign-in screen */}
+        {onContinueAsGuest && (screen === 'signin' || screen === 'signup') && (
+          <button className="auth-guest-btn" onClick={onContinueAsGuest}>
+            Continue without account →
+          </button>
         )}
       </div>
     </div>
