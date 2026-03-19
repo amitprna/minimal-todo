@@ -131,6 +131,39 @@
   outline: none;
 }
 
+/* User & Logout row */
+.sidebar-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.9rem 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.sidebar-user-email {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.sidebar-logout-btn {
+  background: none;
+  border: none;
+  color: var(--color-rose);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.sidebar-logout-btn:hover {
+  background: color-mix(in srgb, var(--color-rose) 10%, transparent);
+}
+
 /* ── Category List ────────────────────────────────────────────────── */
 .category-list {
   display: flex;
