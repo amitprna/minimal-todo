@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  AWS_REGION: ap-south-1
+  AWS_REGION: us-east-1
 
 jobs:
   # ── 1. Deploy AWS Infrastructure with CDK ───────────────────────────────────
