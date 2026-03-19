@@ -45,12 +45,11 @@ export class TodoStack extends cdk.Stack {
     });
 
     // ── 2. DynamoDB Table (single-table design) ─────────────────────────
-    // PK: USER#<userId>   SK: CATEGORY#<id> | TASK#<id> | NOTE#<categoryId>
     const table = new dynamodb.Table(this, 'TodoTable', {
       tableName: 'todo-items',
       partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // free tier friendly
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
@@ -60,7 +59,6 @@ export class TodoStack extends cdk.Stack {
       USER_POOL_ID: userPool.userPoolId,
     };
 
-    // ── 4. Lambda functions ─────────────────────────────────────────────
     const nodejsDefaults = {
       runtime: lambda.Runtime.NODEJS_20_X,
       timeout: cdk.Duration.seconds(10),
@@ -71,6 +69,7 @@ export class TodoStack extends cdk.Stack {
       },
     };
 
+    // ── 4. Lambda functions ─────────────────────────────────────────────
     const categoriesFn = new lambdaNodejs.NodejsFunction(this, 'CategoriesFn', {
       ...nodejsDefaults,
       entry: path.join(__dirname, '..', 'lambda', 'categories.ts'),
@@ -92,19 +91,18 @@ export class TodoStack extends cdk.Stack {
       functionName: 'todo-notes',
     });
 
-    // Grant DynamoDB permissions
     table.grantReadWriteData(categoriesFn);
     table.grantReadWriteData(tasksFn);
     table.grantReadWriteData(notesFn);
 
-    // ── 5. HTTP API Gateway with Cognito JWT Authorizer ─────────────────
+    // ── 5. HTTP API Gateway ─────────────────────────────────────────────
     const httpApi = new apigateway.HttpApi(this, 'TodoApi', {
       apiName: 'todo-api',
       corsPreflight: {
         allowHeaders: ['Content-Type', 'Authorization'],
         allowMethods: [apigateway.CorsHttpMethod.ANY],
-        allowOrigins: ['*'], // locked down to CF URL after first deploy
-         maxAge: cdk.Duration.days(1),
+        allowOrigins: ['*'],
+        maxAge: cdk.Duration.days(1),
       },
     });
 
@@ -121,7 +119,6 @@ export class TodoStack extends cdk.Stack {
       authorizationScopes: [],
     };
 
-    // Categories routes
     httpApi.addRoutes({
       path: '/api/categories',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.POST],
@@ -134,8 +131,6 @@ export class TodoStack extends cdk.Stack {
       integration: new apigatewayIntegrations.HttpLambdaIntegration('CategoriesIdIntegration', categoriesFn),
       ...authorizationConfig,
     });
-
-    // Tasks routes
     httpApi.addRoutes({
       path: '/api/tasks',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.POST],
@@ -148,8 +143,6 @@ export class TodoStack extends cdk.Stack {
       integration: new apigatewayIntegrations.HttpLambdaIntegration('TasksIdIntegration', tasksFn),
       ...authorizationConfig,
     });
-
-    // Notes routes
     httpApi.addRoutes({
       path: '/api/notes/{categoryId}',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.PUT],
@@ -195,7 +188,6 @@ export class TodoStack extends cdk.Stack {
         },
       },
       defaultRootObject: 'index.html',
-      // SPA routing: return index.html for 403/404
       errorResponses: [
         { httpStatus: 403, responseHttpStatus: 200, responsePagePath: '/index.html' },
         { httpStatus: 404, responseHttpStatus: 200, responsePagePath: '/index.html' },
@@ -206,34 +198,28 @@ export class TodoStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: `https://${distribution.distributionDomainName}`,
       description: 'The live URL for the Todo app',
-      exportName: 'TodoCloudFrontURL',
     });
 
     new cdk.CfnOutput(this, 'S3BucketName', {
       value: frontendBucket.bucketName,
       description: 'S3 bucket for frontend deployment',
-      exportName: 'TodoS3BucketName',
     });
 
     new cdk.CfnOutput(this, 'CloudFrontDistributionId', {
       value: distribution.distributionId,
       description: 'CloudFront Distribution ID (for cache invalidation)',
-      exportName: 'TodoDistributionId',
     });
 
     new cdk.CfnOutput(this, 'UserPoolId', {
       value: userPool.userPoolId,
-      exportName: 'TodoUserPoolId',
     });
 
     new cdk.CfnOutput(this, 'UserPoolClientId', {
       value: userPoolClient.userPoolClientId,
-      exportName: 'TodoUserPoolClientId',
     });
 
     new cdk.CfnOutput(this, 'ApiEndpoint', {
       value: httpApi.apiEndpoint,
-      exportName: 'TodoApiEndpoint',
     });
   }
 }
