@@ -46,7 +46,8 @@ const playCompleteSound = () => {
 };
 
 function App() {
-  const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Moments');
+  const { user, signOut } = useAuth();
+  const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Minimal-ToDo');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitleValue, setEditTitleValue] = useState(globalTitle);
 
@@ -271,6 +272,12 @@ function App() {
             </div>
           )}
           </div>
+          {user && (
+            <div className="sidebar-user-row">
+              <span className="sidebar-user-email">{user.signInDetails?.loginId || user.username}</span>
+              <button className="sidebar-logout-btn" onClick={signOut} title="Sign Out">Logout</button>
+            </div>
+          )}
 
         <nav className="category-list">
           {categories.map(category => {
