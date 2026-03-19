@@ -1,6 +1,6 @@
-# Moments — Multi-User Todo App
+# Minimal-ToDo — Multi-User App
 
-A Japandi-aesthetic task management app, deployed on AWS.
+A Japandi-aesthetic task management app, rebranded and ready for deployment.
 
 ---
 
@@ -115,6 +115,6 @@ todo/
       tasks.ts          ← Tasks CRUD
       notes.ts          ← Notes CRUD
   .github/
-    workflows/
+    workflows:
       deploy.yml        ← CI/CD pipeline
 ```

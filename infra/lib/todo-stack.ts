@@ -12,13 +12,13 @@ import * as cloudfrontOrigins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as path from 'path';
 import { Construct } from 'constructs';
 
-export class TodoStack extends cdk.Stack {
+export class MinimalTodoStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // ── 1. Cognito User Pool ────────────────────────────────────────────
-    const userPool = new cognito.UserPool(this, 'TodoUserPool', {
-      userPoolName: 'todo-user-pool',
+    const userPool = new cognito.UserPool(this, 'MinimalTodoUserPool', {
+      userPoolName: 'minimal-todo-user-pool',
       selfSignUpEnabled: true,
       signInAliases: { email: true },
       autoVerify: { email: true },
@@ -33,9 +33,9 @@ export class TodoStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN, // keep users on stack destroy
     });
 
-    const userPoolClient = new cognito.UserPoolClient(this, 'TodoUserPoolClient', {
+    const userPoolClient = new cognito.UserPoolClient(this, 'MinimalTodoUserPoolClient', {
       userPool,
-      userPoolClientName: 'todo-web-client',
+      userPoolClientName: 'minimal-todo-web-client',
       authFlows: {
         userSrp: true,
         userPassword: false,
@@ -46,8 +46,8 @@ export class TodoStack extends cdk.Stack {
 
     // ── 2. DynamoDB Table (single-table design) ─────────────────────────
     // PK: USER#<userId>   SK: CATEGORY#<id> | TASK#<id> | NOTE#<categoryId>
-    const table = new dynamodb.Table(this, 'TodoTable', {
-      tableName: 'todo-items',
+    const table = new dynamodb.Table(this, 'MinimalTodoTable', {
+      tableName: 'minimal-todo-items',
       partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // free tier friendly
@@ -98,8 +98,8 @@ export class TodoStack extends cdk.Stack {
     table.grantReadWriteData(notesFn);
 
     // ── 5. HTTP API Gateway with Cognito JWT Authorizer ─────────────────
-    const httpApi = new apigateway.HttpApi(this, 'TodoApi', {
-      apiName: 'todo-api',
+    const httpApi = new apigateway.HttpApi(this, 'MinimalTodoApi', {
+      apiName: 'minimal-todo-api',
       corsPreflight: {
         allowHeaders: ['Content-Type', 'Authorization'],
         allowMethods: [apigateway.CorsHttpMethod.ANY],
@@ -159,7 +159,7 @@ export class TodoStack extends cdk.Stack {
 
     // ── 6. S3 Bucket for React frontend ─────────────────────────────────
     const frontendBucket = new s3.Bucket(this, 'FrontendBucket', {
-      bucketName: `todo-frontend-${this.account}-${this.region}`,
+      bucketName: `minimal-todo-frontend-${this.account}-${this.region}`,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
