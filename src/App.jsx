@@ -7,32 +7,7 @@ import TaskList from './components/TaskList'
 import TaskNotes from './components/TaskNotes'
 import './App.css'
 
-const CATEGORY_COLORS = [
-  'var(--color-sage)',
-  'var(--color-slate)',
-  'var(--color-sand)',
-  'var(--color-clay)',
-  'var(--color-rose)',
-  'var(--color-peach)',
-];
-
-// Resolved hex-like values for the color swatch display
-const COLOR_SWATCHES = [
-  { label: 'Sage',  value: 'var(--color-sage)',  hex: '#6fa664' },
-  { label: 'Slate', value: 'var(--color-slate)', hex: '#6d8fa3' },
-  { label: 'Sand',  value: 'var(--color-sand)',  hex: '#c4aa8f' },
-  { label: 'Clay',  value: 'var(--color-clay)',  hex: '#b8714f' },
-  { label: 'Rose',  value: 'var(--color-rose)',  hex: '#c8788a' },
-  { label: 'Peach', value: 'var(--color-peach)', hex: '#e88a66' },
-];
-
-export const initialCategories = [
-  { id: '1', name: 'Personal', color: 'var(--color-sage)' },
-  { id: '2', name: 'Work', color: 'var(--color-slate)' },
-  { id: '3', name: 'Groceries', color: 'var(--color-sand)' },
-  { id: '4', name: 'Projects', color: 'var(--color-clay)' },
-  { id: '5', name: 'Ideas', color: 'var(--color-rose)' }
-];
+import { CATEGORY_COLORS, COLOR_SWATCHES, initialCategories } from './constants'
 
 // iPhone-style "ding" — single clean C6 tone with fast attack, smooth decay
 const playCompleteSound = () => {
