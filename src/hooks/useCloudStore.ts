@@ -147,9 +147,19 @@ export function useCloudStore() {
     api.tasks.delete(id).catch(e => console.error(e));
   }, []);
 
-  const setCategoryNotes = useCallback((catId: string, content: string) => {
-    setCategoryNotesState(prev => ({ ...prev, [catId]: content }));
-    api.notes.save(catId, content).catch(e => console.error(e));
+  const setCategoryNotes = useCallback((valOrUpdater: any) => {
+    setCategoryNotesState(prev => {
+      const next = typeof valOrUpdater === 'function' ? valOrUpdater(prev) : valOrUpdater;
+      
+      // Sync changed notes to cloud
+      Object.entries(next).forEach(([catId, content]) => {
+        if (prev[catId] !== content) {
+          api.notes.save(catId, content as string).catch(e => console.error(e));
+        }
+      });
+      
+      return next;
+    });
   }, []);
 
   return {

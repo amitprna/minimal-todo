@@ -3,6 +3,7 @@ import { Plus, Edit3, Trash2, Palette, Moon, Sun, FileText, Pin } from 'lucide-r
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useCloudStore } from './hooks/useCloudStore'
+import { useAuth } from './hooks/useAuth'
 import TaskList from './components/TaskList'
 import TaskNotes from './components/TaskNotes'
 import './App.css'
