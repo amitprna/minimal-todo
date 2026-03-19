@@ -50,9 +50,18 @@ export default function AuthScreen({ onContinueAsGuest }: AuthScreenProps) {
       </div>
 
       <div className="auth-card">
-        {/* Logo — only "Minimal-ToDo" branded, highlighted */}
+        {/* Logo — checklist icon + Minimal-ToDo name */}
         <div className="auth-logo">
-          <span className="auth-logo-dot" />
+          <svg className="auth-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+            <rect x="3" y="3" width="18" height="18" rx="5" fill="url(#logoGrad)" />
+            <path d="M7 12l3 3 7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <defs>
+              <linearGradient id="logoGrad" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#e3c9a8" />
+                <stop offset="100%" stopColor="#c4a07e" />
+              </linearGradient>
+            </defs>
+          </svg>
           <span className="auth-logo-text"><strong>Minimal-ToDo</strong></span>
         </div>
 

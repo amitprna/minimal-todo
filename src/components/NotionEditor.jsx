@@ -9,7 +9,7 @@ import './NotionEditor.css';
 export default function NotionEditor({ initialContent, onSave, placeholder }) {
   const editorRef = useRef(null);
 
-  // Initialise content
+  // Initialise content — always ensure a block element on first line
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
@@ -18,7 +18,8 @@ export default function NotionEditor({ initialContent, onSave, placeholder }) {
       el.innerHTML = markdownToBlocks(initialContent);
       el.removeAttribute('data-empty');
     } else {
-      // Leave truly empty so the CSS placeholder shows immediately
+      // Start with an explicit empty <p> so the first keydown lands inside a block
+      el.innerHTML = '<p><br></p>';
       el.setAttribute('data-empty', 'true');
     }
     placeCursorAtEnd(el);

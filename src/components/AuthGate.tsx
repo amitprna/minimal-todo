@@ -10,34 +10,26 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const [isGuest, setIsGuest] = useState(false);
 
-  // Show beforeunload warning if guest has data (handled in App via window.onbeforeunload)
+  // Signed in → exit guest mode automatically
+  useEffect(() => { if (user) setIsGuest(false); }, [user]);
+
+  // Warn before close if guest has tasks
   useEffect(() => {
-    if (isGuest) {
-      const handler = (e: BeforeUnloadEvent) => {
-        const hasData = localStorage.getItem('japandi-tasks');
-        const tasks = hasData ? JSON.parse(hasData) : [];
-        if (tasks.length > 0) {
-          e.preventDefault();
-          e.returnValue = 'You have unsaved tasks. Sign in to keep your data!';
-        }
-      };
-      window.addEventListener('beforeunload', handler);
-      return () => window.removeEventListener('beforeunload', handler);
-    }
+    if (!isGuest) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      const tasks = JSON.parse(localStorage.getItem('japandi-tasks') || '[]');
+      if (tasks.length > 0) { e.preventDefault(); e.returnValue = ''; }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
   }, [isGuest]);
 
   if (loading) {
     return (
       <div style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--bg-main)',
-        color: 'var(--text-muted)',
-        fontSize: '0.95rem',
-        letterSpacing: '0.08em',
-        gap: '0.75rem',
+        height: '100vh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: 'var(--bg-main)',
+        color: 'var(--text-muted)', fontSize: '0.95rem', letterSpacing: '0.08em', gap: '0.75rem',
       }}>
         <span className="loading-dot-anim" />
         Loading…
@@ -49,5 +41,18 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     return <AuthScreen onContinueAsGuest={() => setIsGuest(true)} />;
   }
 
-  return <>{children}</>;
+  // Pass setIsGuest(false) down so App can show the auth screen from anywhere
+  return (
+    <>
+      {isGuest && !user ? (
+        // Wrap children in a context-like approach — pass onSignIn via a hidden global
+        (() => {
+          (window as any).__requestSignIn = () => setIsGuest(false);
+          return children;
+        })()
+      ) : (
+        (() => { delete (window as any).__requestSignIn; return children; })()
+      )}
+    </>
+  );
 }

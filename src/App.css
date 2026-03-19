@@ -214,16 +214,55 @@
 }
 
 
-/* ── Guest mode banner ─────────────────────────────────────────────── */
+/* ── Guest mode banner — clickable sign-in button ─────────────────────────── */
 .guest-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0 0 0.75rem;
-  padding: 0.65rem 0.9rem;
-  border-radius: 12px;
-  background: color-mix(in srgb, #c4aa8f 12%, var(--bg-card));
-  border: 1px dashed rgba(196, 170, 143, 0.5);
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(196,170,143,0.15), rgba(228,210,185,0.12));
+  border: 1px solid rgba(196, 170, 143, 0.4);
   font-size: 0.78rem;
   line-height: 1.5;
   color: var(--text-muted);
+  text-align: left;
+  cursor: default;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(196, 170, 143, 0.12);
+}
+
+.guest-banner-btn {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.guest-banner-btn:hover {
+  background: linear-gradient(135deg, rgba(196,170,143,0.25), rgba(228,210,185,0.2));
+  border-color: rgba(196, 170, 143, 0.6);
+  color: var(--text-main);
+  box-shadow: 0 4px 14px rgba(196, 170, 143, 0.22);
+  transform: translateY(-1px);
+}
+
+.guest-banner-btn:active { transform: translateY(0); }
+
+.guest-banner-arrow {
+  margin-left: auto;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.guest-banner-btn:hover .guest-banner-arrow {
+  transform: translateX(3px);
+  opacity: 1;
+}
+
+/* Sign in button in user menu */
+.user-menu-signin {
+  color: #b89060 !important;
 }
 
 /* ── Category List ────────────────────────────────────────────────── */

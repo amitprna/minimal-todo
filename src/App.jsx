@@ -284,11 +284,16 @@ function App() {
           )}
           </div>
 
-          {/* Guest mode banner */}
+          {/* Guest mode banner — clickable to sign in */}
           {!user && (
-            <div className="guest-banner stagger-2">
-              <span className="guest-banner-text">👋 Sign in to sync your tasks across devices</span>
-            </div>
+            <button
+              className="guest-banner guest-banner-btn stagger-2"
+              onClick={() => window.__requestSignIn?.()}
+            >
+              <span>👋</span>
+              <span>Sign in to sync your tasks across devices</span>
+              <span className="guest-banner-arrow">→</span>
+            </button>
           )}
 
         <nav className="category-list stagger-3">
@@ -407,7 +412,16 @@ function App() {
                     </button>
                   </>
                 ) : (
-                  <p className="user-menu-email" style={{ color: 'var(--text-muted)' }}>Guest mode<br/><small>Sign in to sync data</small></p>
+                  <>
+                    <p className="user-menu-email">Guest mode</p>
+                    <hr className="user-menu-divider" />
+                    <button
+                      className="user-menu-action user-menu-signin"
+                      onClick={() => { setShowUserMenu(false); window.__requestSignIn?.(); }}
+                    >
+                      <User size={14} /> Sign in
+                    </button>
+                  </>
                 )}
               </div>
             )}
