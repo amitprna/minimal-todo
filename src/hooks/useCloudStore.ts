@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api, Category, Task } from '../api/client';
 import { useAuth } from './useAuth';
-import { initialCategories } from '../App'; // We'll export this from App.jsx
+import { initialCategories } from '../constants';
 
 export function useCloudStore() {
   const { user } = useAuth();
