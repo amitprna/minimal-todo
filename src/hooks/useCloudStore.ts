@@ -11,9 +11,19 @@ export function useCloudStore() {
   const [categoryNotes, setCategoryNotesState] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  // Load from API on mount
+  // Load from API on mount (or from localStorage if guest)
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // Guest mode — load from localStorage
+      const localCats = JSON.parse(localStorage.getItem('japandi-categories') || 'null') || initialCategories;
+      const localTasks = JSON.parse(localStorage.getItem('japandi-tasks') || 'null') || [];
+      const localNotes = JSON.parse(localStorage.getItem('japandi-cat-notes') || 'null') || {};
+      setCategoriesState(localCats);
+      setTasksState(localTasks);
+      setCategoryNotesState(localNotes);
+      setLoading(false);
+      return;
+    }
     
     let isMounted = true;
     (async () => {
@@ -76,23 +86,23 @@ export function useCloudStore() {
   const setCategories = useCallback((valOrUpdater: any) => {
     setCategoriesState(prev => {
       const next = typeof valOrUpdater === 'function' ? valOrUpdater(prev) : valOrUpdater;
-      
-      // Only PUT categories that changed or changed order
-      next.forEach((cat: any, idx: number) => {
-        const prevCat = prev.find(c => c.id === cat.id);
-        const prevIdx = prev.findIndex(c => c.id === cat.id);
-        if (!prevCat || prevIdx !== idx || JSON.stringify(prevCat) !== JSON.stringify(cat)) {
-          api.categories.update(cat.id, { ...cat, order: idx });
-        }
-      });
-      // Handle deletions
-      prev.forEach(cat => {
-        if (!next.find((c: any) => c.id === cat.id)) api.categories.delete(cat.id);
-      });
-      
+      if (!user) {
+        localStorage.setItem('japandi-categories', JSON.stringify(next));
+      } else {
+        next.forEach((cat: any, idx: number) => {
+          const prevCat = prev.find(c => c.id === cat.id);
+          const prevIdx = prev.findIndex(c => c.id === cat.id);
+          if (!prevCat || prevIdx !== idx || JSON.stringify(prevCat) !== JSON.stringify(cat)) {
+            api.categories.update(cat.id, { ...cat, order: idx });
+          }
+        });
+        prev.forEach(cat => {
+          if (!next.find((c: any) => c.id === cat.id)) api.categories.delete(cat.id);
+        });
+      }
       return next;
     });
-  }, []);
+  }, [user]);
 
   const addCategory = useCallback((cat: Category) => {
     setCategoriesState(prev => [...prev, cat]);
@@ -107,23 +117,23 @@ export function useCloudStore() {
   const setTasks = useCallback((valOrUpdater: any) => {
     setTasksState(prev => {
       const next = typeof valOrUpdater === 'function' ? valOrUpdater(prev) : valOrUpdater;
-      
-      // Only PUT tasks that changed or changed order
-      next.forEach((task: any, idx: number) => {
-        const prevTask = prev.find(t => t.id === task.id);
-        const prevIdx = prev.findIndex(t => t.id === task.id);
-        if (!prevTask || prevIdx !== idx || JSON.stringify(prevTask) !== JSON.stringify(task)) {
-          api.tasks.update(task.id, { ...task, order: idx });
-        }
-      });
-      // Handle deletions
-      prev.forEach(task => {
-        if (!next.find((t: any) => t.id === task.id)) api.tasks.delete(task.id);
-      });
-      
+      if (!user) {
+        localStorage.setItem('japandi-tasks', JSON.stringify(next));
+      } else {
+        next.forEach((task: any, idx: number) => {
+          const prevTask = prev.find(t => t.id === task.id);
+          const prevIdx = prev.findIndex(t => t.id === task.id);
+          if (!prevTask || prevIdx !== idx || JSON.stringify(prevTask) !== JSON.stringify(task)) {
+            api.tasks.update(task.id, { ...task, order: idx });
+          }
+        });
+        prev.forEach(task => {
+          if (!next.find((t: any) => t.id === task.id)) api.tasks.delete(task.id);
+        });
+      }
       return next;
     });
-  }, []);
+  }, [user]);
 
   const addTask = useCallback((task: Task) => {
     setTasksState(prev => [...prev, task]);

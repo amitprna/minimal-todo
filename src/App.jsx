@@ -49,12 +49,21 @@ const playCompleteSound = () => {
 function App() {
   const { user, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
   const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Minimal-ToDo');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitleValue, setEditTitleValue] = useState(globalTitle);
 
   // --- Dark Mode State ---
   const [isDarkMode, setIsDarkMode] = useLocalStorage('japandi-dark-mode', false);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const handler = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showUserMenu]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -386,7 +395,7 @@ function App() {
           </button>
 
           {/* User icon button with popover menu */}
-          <div className="user-menu-wrap">
+          <div className="user-menu-wrap" ref={userMenuRef}>
             {showUserMenu && (
               <div className="user-menu-popover animate-in">
                 {user ? (
