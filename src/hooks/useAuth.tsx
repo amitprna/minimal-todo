@@ -5,6 +5,8 @@ import {
   signOut,
   confirmSignUp,
   getCurrentUser,
+  resetPassword,
+  confirmResetPassword,
   type AuthUser,
 } from 'aws-amplify/auth';
 
@@ -16,6 +18,8 @@ interface AuthState {
   signUp: (email: string, password: string) => Promise<'CONFIRM_SIGN_UP' | 'DONE'>;
   confirmCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
+  reqPasswordReset: (email: string) => Promise<void>;
+  confirmPasswordReset: (email: string, code: string, newPass: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -71,6 +75,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
+  const handleReqPasswordReset = async (email: string) => {
+    setError(null);
+    try {
+      await resetPassword({ username: email });
+    } catch (e: unknown) {
+      setError((e as Error).message);
+      throw e;
+    }
+  };
+
+  const handleConfirmPasswordReset = async (email: string, code: string, newPass: string) => {
+    setError(null);
+    try {
+      await confirmResetPassword({ username: email, confirmationCode: code, newPassword: newPass });
+    } catch (e: unknown) {
+      setError((e as Error).message);
+      throw e;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -80,6 +104,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp: handleSignUp,
       confirmCode: handleConfirm,
       signOut: handleSignOut,
+      reqPasswordReset: handleReqPasswordReset,
+      confirmPasswordReset: handleConfirmPasswordReset,
     }}>
       {children}
     </AuthContext.Provider>

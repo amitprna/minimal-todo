@@ -123,13 +123,13 @@ export class TodoStack extends cdk.Stack {
 
     // Categories routes
     httpApi.addRoutes({
-      path: '/categories',
+      path: '/api/categories',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.POST],
       integration: new apigatewayIntegrations.HttpLambdaIntegration('CategoriesIntegration', categoriesFn),
       ...authorizationConfig,
     });
     httpApi.addRoutes({
-      path: '/categories/{id}',
+      path: '/api/categories/{id}',
       methods: [apigateway.HttpMethod.PUT, apigateway.HttpMethod.DELETE],
       integration: new apigatewayIntegrations.HttpLambdaIntegration('CategoriesIdIntegration', categoriesFn),
       ...authorizationConfig,
@@ -137,13 +137,13 @@ export class TodoStack extends cdk.Stack {
 
     // Tasks routes
     httpApi.addRoutes({
-      path: '/tasks',
+      path: '/api/tasks',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.POST],
       integration: new apigatewayIntegrations.HttpLambdaIntegration('TasksIntegration', tasksFn),
       ...authorizationConfig,
     });
     httpApi.addRoutes({
-      path: '/tasks/{id}',
+      path: '/api/tasks/{id}',
       methods: [apigateway.HttpMethod.PUT, apigateway.HttpMethod.DELETE],
       integration: new apigatewayIntegrations.HttpLambdaIntegration('TasksIdIntegration', tasksFn),
       ...authorizationConfig,
@@ -151,7 +151,7 @@ export class TodoStack extends cdk.Stack {
 
     // Notes routes
     httpApi.addRoutes({
-      path: '/notes/{categoryId}',
+      path: '/api/notes/{categoryId}',
       methods: [apigateway.HttpMethod.GET, apigateway.HttpMethod.PUT],
       integration: new apigatewayIntegrations.HttpLambdaIntegration('NotesIntegration', notesFn),
       ...authorizationConfig,
