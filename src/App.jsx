@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Palette, Moon, Sun, FileText, Pin, User, LogOut } from 'lucide-react'
+import { Plus, Edit3, Trash2, Palette, Moon, Sun, FileText, Pin, User, LogOut, Menu, X } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useCloudStore } from './hooks/useCloudStore'
@@ -49,6 +49,7 @@ const playCompleteSound = () => {
 function App() {
   const { user, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const userMenuRef = useRef(null);
   const [globalTitle, setGlobalTitle] = useLocalStorage('japandi-title', 'Minimal-ToDo');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -260,8 +261,13 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile sidebar overlay */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-content-wrapper">
           <div className="sidebar-header stagger-1">
             {isEditingTitle ? (
@@ -317,7 +323,7 @@ function App() {
               onDragOver={(e)  => handleCatDragOver(e,  category.id)}
               onDrop={(e)      => handleCatDrop(e,      category.id)}
               onDragEnd={handleCatDragEnd}
-              onClick={() => { setActiveCategory(category.id); setColorPickerCatId(null); }}
+              onClick={() => { setActiveCategory(category.id); setColorPickerCatId(null); setIsSidebarOpen(false); }}
             >
               <div className="cat-main">
                 <div className="category-color-dot" style={{ backgroundColor: category.color }} />
@@ -442,6 +448,10 @@ function App() {
         <main className={`main-content ${isNotesPanelOpen ? 'split-active' : ''}`}>
           <header className="header animate-in">
             <div className="header-left">
+              {/* Hamburger — mobile only */}
+              <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)} title="Open menu">
+                <Menu size={20} />
+              </button>
               <div className="header-color-bar" style={{ backgroundColor: currentCategory?.color }} />
               <h1>{currentCategory?.name || 'Select a list'}</h1>
             </div>
