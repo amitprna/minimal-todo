@@ -16,4 +16,8 @@ export const amplifyConfig = {
 };
 
 /** Base URL for the API (CloudFront routes /api/* → API Gateway) */
-export const API_BASE = import.meta.env.VITE_API_BASE ?? '/api';
+const base = import.meta.env.VITE_API_BASE ?? '/api';
+// Smart fix for Vercel: if API_BASE is a full URL but doesn't end in /api, append it.
+export const API_BASE = (base.startsWith('http') && !base.endsWith('/api')) 
+  ? `${base}/api` 
+  : base;
