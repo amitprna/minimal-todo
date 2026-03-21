@@ -71,25 +71,46 @@ export default function NotionEditor({ initialContent, onSave, placeholder }) {
       }
     }
 
+    if (e.key === 'Backspace') {
+      // If the user selects all and presses backspace, ensure we don't leave a bare text node
+      const sel = window.getSelection();
+      if (sel && sel.toString().length === el.textContent.length && el.textContent.length > 0) {
+        e.preventDefault();
+        el.innerHTML = '<p><br></p>';
+        placeCursorAtEnd(el);
+        // Force the data-empty attribute to show placeholder immediately
+        el.setAttribute('data-empty', 'true');
+        return;
+      }
+    }
+
     if (e.key === 'Enter') {
       const block = getCurrentBlock();
       if (!block) return;
       const tag = block.tagName?.toLowerCase();
 
-      // Continue list items on enter, but break out on double-enter (empty item)
-      if (tag === 'li') {
-        if (block.textContent === '') {
-          // Exit list
-          e.preventDefault();
-          const p = document.createElement('p');
-          p.innerHTML = '<br>';
-          block.parentElement.parentElement
-            ? block.closest('ul,ol').insertAdjacentElement('afterend', p)
-            : el.appendChild(p);
-          block.remove();
-          setCursorInBlock(p);
-          return;
-        }
+      // Break out of list on empty item
+      if (tag === 'li' && block.textContent === '') {
+        e.preventDefault();
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        block.parentElement.parentElement
+          ? block.closest('ul,ol').insertAdjacentElement('afterend', p)
+          : el.appendChild(p);
+        block.remove();
+        setCursorInBlock(p);
+        return;
+      }
+
+      // Break out of blockquote on empty line
+      if (tag === 'blockquote' && block.textContent === '') {
+        e.preventDefault();
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        block.insertAdjacentElement('afterend', p);
+        block.remove();
+        setCursorInBlock(p);
+        return;
       }
     }
   }, []);

@@ -96,9 +96,13 @@ function App() {
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  // Notes panel open state per category (true by default if undefined)
+  // Notes panel open state per category
+  // On desktop it defaults to true if undefined. On mobile (< 768px), it always defaults to false to avoid blocking the screen.
   const [categoryNotesOpen, setCategoryNotesOpen] = useLocalStorage('japandi-notes-open-state', {});
-  const isNotesPanelOpen = activeCategory ? categoryNotesOpen[activeCategory] !== false : false;
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const isNotesPanelOpen = activeCategory 
+    ? (categoryNotesOpen[activeCategory] !== undefined ? categoryNotesOpen[activeCategory] : !isMobile)
+    : false;
 
   const toggleNotesPanel = () => {
     if (!activeCategory) return;
