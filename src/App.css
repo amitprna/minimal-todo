@@ -277,8 +277,9 @@
 .category-item {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.35rem;
   padding: 0.75rem 0.9rem;
   border-radius: 14px;
   color: var(--text-muted);
@@ -385,8 +386,7 @@
   gap: 0.25rem;
   opacity: 0;
   transition: opacity var(--transition-fast);
-  position: absolute;
-  right: 0.9rem;
+  flex-shrink: 0;
   pointer-events: none;
 }
 

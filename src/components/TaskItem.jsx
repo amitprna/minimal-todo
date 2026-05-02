@@ -3,6 +3,7 @@ import { CheckCircle2, Circle, ChevronDown, ChevronRight, Pin, Plus, Trash2, Edi
 import './TaskItem.css';
 import { v4 as uuidv4 } from 'uuid';
 
+
 export default function TaskItem({ 
   task, 
   categoryColor, 
@@ -18,6 +19,8 @@ export default function TaskItem({
   const [newSubtask, setNewSubtask] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
+  const [editingSubtaskId, setEditingSubtaskId] = useState(null);
+  const [editingSubtaskTitle, setEditingSubtaskTitle] = useState('');
 
   const saveEdit = () => {
     if (editTitle.trim() && editTitle.trim() !== task.title) {
@@ -49,6 +52,22 @@ export default function TaskItem({
   const deleteSubtask = (subtaskId) => {
     const updatedSubtasks = task.subtasks.filter(st => st.id !== subtaskId);
     onUpdateSubtasks(task.id, updatedSubtasks);
+  };
+
+  const startEditSubtask = (subtask) => {
+    setEditingSubtaskId(subtask.id);
+    setEditingSubtaskTitle(subtask.title);
+  };
+
+  const saveEditSubtask = (subtaskId) => {
+    if (editingSubtaskTitle.trim()) {
+      const updatedSubtasks = task.subtasks.map(st =>
+        st.id === subtaskId ? { ...st, title: editingSubtaskTitle.trim() } : st
+      );
+      onUpdateSubtasks(task.id, updatedSubtasks);
+    }
+    setEditingSubtaskId(null);
+    setEditingSubtaskTitle('');
   };
 
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
@@ -156,15 +175,42 @@ export default function TaskItem({
                     <Circle size={18} className="text-muted" />
                   }
                 </button>
-                <span className={`subtask-title ${subtask.completed ? 'text-muted strike' : ''}`}>
-                  {subtask.title}
-                </span>
-                <button 
-                  className="action-btn delete-btn small"
-                  onClick={() => deleteSubtask(subtask.id)}
-                >
-                  <Trash2 size={14} />
-                </button>
+                {editingSubtaskId === subtask.id ? (
+                  <input
+                    className="subtask-edit-input"
+                    value={editingSubtaskTitle}
+                    onChange={(e) => setEditingSubtaskTitle(e.target.value)}
+                    onBlur={() => saveEditSubtask(subtask.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') saveEditSubtask(subtask.id);
+                      if (e.key === 'Escape') { setEditingSubtaskId(null); setEditingSubtaskTitle(''); }
+                    }}
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className={`subtask-title ${subtask.completed ? 'text-muted strike' : ''}`}>
+                    {subtask.title}
+                  </span>
+                )}
+                <div className="subtask-actions">
+                  {!subtask.completed && (
+                    <button 
+                      className="action-btn small"
+                      onClick={(e) => { e.stopPropagation(); startEditSubtask(subtask); }}
+                      title="Edit subtask"
+                    >
+                      <Edit3 size={13} />
+                    </button>
+                  )}
+                  <button 
+                    className="action-btn delete-btn small"
+                    onClick={(e) => { e.stopPropagation(); deleteSubtask(subtask.id); }}
+                    title="Delete subtask"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
